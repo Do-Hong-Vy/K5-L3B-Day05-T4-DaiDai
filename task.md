@@ -25,27 +25,27 @@
 ### Đỗ Hồng Vỹ — Kịch bản & Mức tự chủ
 
 **§1 Lát cắt & phạm vi (R1 · 5đ)**
-- [ ] Chép lát cắt từ track vào `spec.md`.
-- [ ] Viết **3 việc KHÔNG làm**, mỗi việc 1 câu lý do. Gợi ý hướng: không xử phạt/khoá shop (`phat_shop` — thuộc bộ phận chuyên trách); không xử lý nghi hàng giả; không đưa SĐT/địa chỉ giữa hai bên; không xử lý khiếu nại khác ngoài "không đúng mô tả" (giao trễ, mất hàng…).
+- [x] Chép lát cắt từ track vào `03-spec-template.md`.
+- [x] Viết **3 việc KHÔNG làm**, mỗi việc 1 câu lý do. Gợi ý hướng: không xử phạt/khoá shop (`phat_shop` — thuộc bộ phận chuyên trách); không xử lý nghi hàng giả; không đưa SĐT/địa chỉ giữa hai bên; không xử lý khiếu nại khác ngoài "không đúng mô tả" (giao trễ, mất hàng…).
 
 **§2 Kịch bản rủi ro (R2 · 10đ) — mốc M1, phút 45**
-- [ ] Gom ý cả nhóm, viết **≥8 kịch bản** dạng bảng: `tin người dùng | lớp ①②③④ | AI có thể sai thế nào | sản phẩm tốt nên làm gì | nhãn`.
-- [ ] Mỗi lớp ①②③④ ít nhất 1 kịch bản; phủ **đủ 6 Hard tests** của track: mô tả bị sửa sau khi bán · doạ bóc phốt · người bán đúng (tem khớp mô tả) · đòi khoá shop / nghi hàng giả · tin cụt ("hàng sai rồi, xử lý đi") · đòi SĐT bên kia.
-- [ ] Cột "AI có thể sai thế nào" **phải trỏ về tool cụ thể** (`soan_hoan_tien`, `tu_choi_khieu_nai`, `phat_shop`, `yeu_cau_bang_chung`, `chuyen_truong_nhom`) hoặc dữ liệu (mô tả lúc đặt vs mô tả hiện tại).
-- [ ] Có ít nhất 1 kịch bản "trông đúng nhưng vẫn rủi ro" (VD: hoàn đúng nhưng chưa cho người bán phản hồi).
-- [ ] Khoanh **2 kịch bản đắt nhất** + lý do vì sao đắt hơn + kịch bản **suýt được chọn** và vì sao không.
+- [x] Gom ý cả nhóm, viết **≥8 kịch bản** dạng bảng: `tin người dùng | lớp ①②③④ | AI có thể sai thế nào | sản phẩm tốt nên làm gì | nhãn`.
+- [x] Mỗi lớp ①②③④ ít nhất 1 kịch bản; phủ **đủ 6 Hard tests** của track: mô tả bị sửa sau khi bán · doạ bóc phốt · người bán đúng (tem khớp mô tả) · đòi khoá shop / nghi hàng giả · tin cụt ("hàng sai rồi, xử lý đi") · đòi SĐT bên kia.
+- [x] Cột "AI có thể sai thế nào" **phải trỏ về tool cụ thể** (`soan_hoan_tien`, `tu_choi_khieu_nai`, `phat_shop`, `yeu_cau_bang_chung`, `chuyen_truong_nhom`) hoặc dữ liệu (mô tả lúc đặt vs mô tả hiện tại).
+- [x] Có ít nhất 1 kịch bản "trông đúng nhưng vẫn rủi ro" (VD: hoàn đúng nhưng chưa cho người bán phản hồi).
+- [x] Khoanh **2 kịch bản đắt nhất** + lý do vì sao đắt hơn + kịch bản **suýt được chọn** và vì sao không.
 
 **§4 Mức tự chủ (R4 · 25đ) — mốc M2, phút 125**
-- [ ] Tổ chức bước "mỗi người tự xếp mức 5 tool trong 5', không bàn" → ghi lại **ai chọn gì**.
-- [ ] Với **từng tool** trong 5 tool: mức (tự làm / cần người duyệt / cấm) · sai thì ai chịu gì · đảo được không · chờ người thì mất gì · phương án đã loại. Nếu cần duyệt: **ai duyệt, thấy gì, quá hạn thì sao**.
-- [ ] **Tool khó xếp nhất** (gần như chắc là `soan_hoan_tien` hoặc `tu_choi_khieu_nai`): cái giá mỗi phía trỏ về kịch bản §2, nhóm chốt thế nào.
-- [ ] **Thử mức** trên 2 kịch bản đắt nhất + 1 kịch bản bình thường (ca áo size L→M, shop đã nhận gửi nhầm) theo 3 câu: sai có bị chặn? còn làm khi lẽ ra phải hỏi? người bình thường có phải chờ vô ích?
-- [ ] Luật thêm / tool tách bước (VD: tách `soan_hoan_tien` thành "soạn đề xuất" + "duyệt chi"; thêm luật "chỉ đề xuất hoàn khi người bán đã hết hạn phản hồi hoặc đồng ý").
-- [ ] Một mức tự chủ đã **đổi lời hứa** nào với người dùng.
+- [ ] Tổ chức bước "mỗi người tự xếp mức 5 tool trong 5', không bàn" → ghi lại **ai chọn gì**. _(Đã viết sẵn phương án của Vỹ trong 03-spec-template.md §4.3; **còn thiếu lựa chọn của Phong và Dương**: cần chạy vòng xếp mức thật rồi điền.)_
+- [x] Với **từng tool** trong 5 tool: mức (tự làm / cần người duyệt / cấm) · sai thì ai chịu gì · đảo được không · chờ người thì mất gì · phương án đã loại. Nếu cần duyệt: **ai duyệt, thấy gì, quá hạn thì sao**.
+- [x] **Tool khó xếp nhất** (gần như chắc là `soan_hoan_tien` hoặc `tu_choi_khieu_nai`): cái giá mỗi phía trỏ về kịch bản §2, nhóm chốt thế nào.
+- [x] **Thử mức** trên 2 kịch bản đắt nhất + 1 kịch bản bình thường (ca áo size L→M, shop đã nhận gửi nhầm) theo 3 câu: sai có bị chặn? còn làm khi lẽ ra phải hỏi? người bình thường có phải chờ vô ích?
+- [x] Luật thêm / tool tách bước (VD: tách `soan_hoan_tien` thành "soạn đề xuất" + "duyệt chi"; thêm luật "chỉ đề xuất hoàn khi người bán đã hết hạn phản hồi hoặc đồng ý").
+- [x] Một mức tự chủ đã **đổi lời hứa** nào với người dùng.
 
 **Repo & nộp bài**
-- [ ] Tạo repo mới (không fork), công khai, copy `03-spec-template.md` → `spec.md`, điền bảng thành viên + **mã HV đúng**.
-- [ ] Cuối buổi: điền cột "Việc đã làm", kiểm tra mở repo bằng cửa sổ ẩn danh, nộp link.
+- [x] Repo `K5-L3B-Day05-T4-DaiDai` đã tạo; bài viết thẳng vào `03-spec-template.md` (không dùng `spec.md`), bảng thành viên + **mã HV đúng**.
+- [ ] Cuối buổi: điền cột "Việc đã làm" cho Phong và Dương (của Vỹ đã điền), điền Bàn/zone, kiểm tra mở repo bằng cửa sổ ẩn danh, nộp link.
 
 ---
 
@@ -66,7 +66,7 @@
 **§7 Kịch bản demo (R7)**
 - [ ] Viết kịch bản demo 4 phút: ai nói gì, bấm đâu. Ca bắt buộc: **người bán đúng hoặc mô tả đã bị sửa**.
 - [ ] Chuẩn bị sẵn 4–5 **ca lạ** có thể bị hỏi và câu trả lời theo đúng mức tự chủ của nhóm; tập cho cả nhóm.
-- [ ] Sau demo: ghi ca lạ nhận được vào §7 của `spec.md`.
+- [ ] Sau demo: ghi ca lạ nhận được vào §7 của `03-spec-template.md`.
 
 ---
 
@@ -80,7 +80,7 @@
 - [ ] Hiện **≥2 mức tự chủ** đúng như §4 của Vỹ: tự làm có **hoàn tác** · cần duyệt có **nút xác nhận + người duyệt thấy gì** · có **đường chuyển người** · việc cấm **không có nút**.
 - [ ] Mỗi nguyên tắc HAX/PAIR Phong chọn phải **chỉ được vào một chỗ** trên màn hình.
 - [ ] Chụp **1–2 ảnh có đánh số** các chỗ, bỏ vào `prototype/` kèm `README.md` (link hoặc file HTML).
-- [ ] Viết §5 trong `spec.md`: link · công cụ · phần nào mock · ảnh đánh số (mỗi số: thể hiện gì, nguyên tắc nào, mức tự chủ nào) · **cách hiện đã chọn, cách khác đã nghĩ tới và vì sao loại** (4đ).
+- [ ] Viết §5 trong `03-spec-template.md`: link · công cụ · phần nào mock · ảnh đánh số (mỗi số: thể hiện gì, nguyên tắc nào, mức tự chủ nào) · **cách hiện đã chọn, cách khác đã nghĩ tới và vì sao loại** (4đ).
 - [ ] **Bonus (nếu kịp)**: màn hình phía người bán (thấy khiếu nại + hạn phản hồi); hoặc 1 lời gọi AI thật so khiếu nại với mô tả lúc đặt — **chỉ dữ liệu dựng, API key để biến môi trường, không commit**.
 - [ ] Kẹt kỹ thuật > 20 phút → gọi TA.
 
@@ -109,7 +109,7 @@
 ## 5. Checklist trước khi nộp (cả nhóm)
 
 - [ ] Repo `K5-L3B-Day05-T4-<TenNhom>` công khai, mở được bằng cửa sổ ẩn danh.
-- [ ] `spec.md` đủ §1–§7, bảng thành viên ở đầu, **mã HV đúng**, cột "Việc đã làm" ghi cụ thể.
+- [ ] `03-spec-template.md` đủ §1–§7, bảng thành viên ở đầu, **mã HV đúng**, cột "Việc đã làm" ghi cụ thể.
 - [ ] `prototype/` có link hoặc file + 1–2 ảnh đánh số.
 - [ ] Không có dữ liệu thật, không có API key trong code.
 - [ ] **Mỗi người trả lời được 3 câu**: "Hành động này sai thì ai mất gì?" · "Lỗi nguy hiểm nhất là gì?" · "Phần bạn làm là gì?" — và chỉ được "chỗ nào trên màn hình là G__".
