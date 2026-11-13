@@ -5,7 +5,7 @@
 ## Mở thế nào
 
 - **File:** [`index.html`](index.html). Chỉ cần mở bằng trình duyệt (Chrome, Edge). Không cần cài đặt, không backend, không đăng nhập, không có API key.
-- Trên GitHub: tải `index.html` về rồi mở, hoặc bật GitHub Pages cho repo và mở `/prototype/`.
+- **Link chạy trực tiếp:** https://do-hong-vy.github.io/K5-L3B-Day05-T4-DaiDai/prototype/ (GitHub Pages). Hoặc tải `index.html` về rồi mở.
 - Thanh trên cùng có các nút: **K1 / K2** để chọn ca · **Số đánh dấu** để bật/tắt các số 1–3 và chữ A–D · **Làm lại ca này** để chạy lại từ đầu.
 - Dải màu vàng dưới thanh tiêu đề luôn ghi **bước tiếp theo cần bấm**, nên bấm từ đầu tới cuối không cần ai can thiệp.
 
@@ -18,11 +18,11 @@
 | 3 | **Xác nhận trả hàng hoàn tiền** **(B)** | Yêu cầu được ghi nhận trong hạn, bản nháp được soạn, hồ sơ chuyển Trưởng nhóm **(C)**, hiện nút **Hoàn tác (A)** |
 | 4 | Màn hình 2 · tab **Nhân viên sàn** | Hai nút tiền bị **khoá theo Luật L3** |
 | 5 | **⏩ Mô phỏng hết 48 giờ** (hoặc tab Người bán → **Không đồng ý**) | Hai nút mở khoá |
-| 6 | **Duyệt chi** / **Từ chối** | Hộp xác nhận: phải tick "đã xem cả hai bên" thì nút mới bấm được |
+| 6 | **Duyệt chi** / **Từ chối** (hai nút cùng kiểu trung tính) | Hộp xác nhận: phải tick "đã xem cả hai bên" thì nút mới bấm được |
 
 Ca **K2** (tai nghe, người bán đúng): Gửi → **Xác nhận tạo yêu cầu** → tab Người bán **Gửi chứng từ** → xem bảng 3 cột **②** → tab Nhân viên sàn duyệt.
 
-Ca lạ có nút sẵn trong khung chat: **"Cho mình SĐT shop"** (Luật L5), **"Khoá shop này đi"** (`phat_shop` = Cấm **(D)**), **"Gặp nhân viên"**. Ở K2 còn có nút mô phỏng **ảnh serial khớp / khác**.
+Ca lạ có nút sẵn trong khung chat: **"Cho mình SĐT shop"** (Luật L5), **"Khoá shop này đi"** (`phat_shop` = Cấm **(D)**), **"Chuyển nhân viên (SLA 24h)"**. Ở K2 còn có nút mô phỏng **ảnh serial khớp / khác**.
 
 ## Ảnh có đánh số
 
@@ -46,7 +46,7 @@ Ca lạ có nút sẵn trong khung chat: **"Cho mình SĐT shop"** (Luật L5), 
 |---|---|---|
 | **A** | Tự làm, có hoàn tác | Nút **↩ Huỷ yêu cầu / Hoàn tác nháp** (huỷ bản nháp `soan_de_xuat_hoan_tien`) |
 | **B** | Cần duyệt, có xác nhận | Nút xác nhận của người mua; ô "Quyết định của shop" (làn nhanh); ô "Quyết định dòng tiền · chỉ nhân viên sàn" (khoá theo L3, có hộp xác nhận) |
-| **C** | Có đường chuyển người | Nút **Gặp nhân viên**; dòng "Đã chuyển Trưởng nhóm · SLA 24h" |
+| **C** | Có đường chuyển người | Nút **Chuyển nhân viên (SLA 24h)**; dòng "Đã chuyển Trưởng nhóm · SLA 24h" |
 | **D** | Việc cấm không có nút | Ô "Không có nút phạt / khoá shop…"; bấm "Khoá shop này đi" thì AI chuyển cho Bộ phận chuyên trách |
 
 ## Phần nào là mock

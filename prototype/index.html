@@ -81,6 +81,7 @@ mark{background:var(--hl);padding:0 2px;border-radius:3px}
 .btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}
 .btn.danger{background:#fff;border-color:var(--bad);color:var(--bad)}
 .btn.ghost{background:none;border-style:dashed}
+.btn.decide{background:#fff;border:1.5px solid #333;color:#222}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .status{display:flex;flex-direction:column;gap:4px;font-size:12.5px}
 .status div::before{content:"● ";color:var(--ok)}
@@ -114,6 +115,7 @@ mark{background:var(--hl);padding:0 2px;border-radius:3px}
 .lv-appr{background:var(--warn-soft);color:var(--warn)}
 .lv-ban{background:var(--bad-soft);color:var(--bad)}
 .lv-rule{background:var(--info-soft);color:var(--info)}
+.lv-sys{background:#eee;color:#555}
 code{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:var(--grey-soft);padding:0 4px;border-radius:4px}
 .legend{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;font-size:12.5px}
 .legend .it{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;display:flex;gap:8px}
@@ -164,15 +166,15 @@ const ORDERS = {
       buyerText:'Tai nghe này fake 100%, tem mờ, khác hẳn cái mình thấy ở cửa hàng chính hãng. Hoàn tiền ngay cho mình.'}
 };
 const fresh = () => ({
-  k1:{step:0, msgs:[], log:[], photo:false, seller:null, hours:0, staff:null},
-  k2:{step:0, msgs:[], log:[], tem:false, serial:null, seller:null, staff:null}
+  k1:{clk:47, step:0, msgs:[], log:[], photo:false, seller:null, hours:0, staff:null},
+  k2:{clk:47, step:0, msgs:[], log:[], tem:false, serial:null, seller:null, staff:null}
 });
 let st = Object.assign({cur:'k1', tab:'seller', marks:true, modal:null}, fresh());
-let clock = 48; // phút giả lập, chỉ để log có giờ khác nhau
 const C = () => st[st.cur];
 const O = () => ORDERS[st.cur];
 const mk = (n, t='p', inl=false) => `<span class="mk ${t}${inl?' inl':''}">${n}</span>`;
-const t = () => { clock += 1; return `09:${String(clock).padStart(2,'0')}`; };
+// Giờ giả lập riêng từng ca (bắt đầu 09:48). K1: người mua xác nhận L7 đúng 09:50 = giờ "ghi nhận trong hạn" ở §3.1.
+const t = () => { const c=C(); c.clk += 1; const h=9+Math.floor(c.clk/60), m=c.clk%60; return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`; };
 function log(tool, lv, note){ C().log.push({time:t(), tool, lv, note}); }
 function say(who, html){ C().msgs.push({who, html}); }
 
@@ -227,7 +229,7 @@ ${diffCard()}
     log('Luật L7','rule','Người mua xác nhận muốn trả hàng hoàn tiền (không chỉ phản ánh).');
     log('soan_de_xuat_hoan_tien','auto','Tạo bản NHÁP hồ sơ (snapshot 03/11 + mô tả 09/11 + lời khiếu nại). Không chuyển tiền. Huỷ được.');
     log('chuyen_truong_nhom','auto','Bắt buộc theo điều kiện (a) — cờ ưu tiên "Mô tả sửa sau khi bán". Xem trong 24h sau hạn phản hồi của shop.');
-    log('Thông báo người bán','auto','Gửi yêu cầu trả hàng #B02 tới Kênh Người Bán · 48 giờ phản hồi (đến 09:50 15/11).');
+    log('Thông báo người bán','sys','Gửi yêu cầu trả hàng #B02 tới Kênh Người Bán · 48 giờ phản hồi (đến 09:50 15/11).');
     say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div>
 <div class="badges"><span class="badge b-ok">Đã ghi nhận trong hạn · 09:50 13/11</span><span class="badge b-info">Đã chuyển Trưởng nhóm · cờ ưu tiên</span></div>
 <p>Mình đã <b>ghi nhận yêu cầu trả hàng trong hạn</b> cho đơn <b>#B02</b> (lúc 09:50 ngày 13/11/2026 — quyền trả hàng của bạn đã được bảo lưu, không bị ảnh hưởng dù quá trình xét duyệt qua ngày 15/11). Mình đã soạn sẵn hồ sơ đính kèm <b>bản chụp mô tả lúc đặt (03/11)</b> và chuyển ưu tiên cho <b>Trưởng nhóm xử lý khiếu nại Shopee</b>.</p>
@@ -270,7 +272,7 @@ ${diffCard()}
   },
   k1_staff_reject(){ const c=st.k1; c.staff='reject'; st.modal=null;
     log('tu_choi_khieu_nai','appr','Nhân viên sàn từ chối (đã tick xác nhận đã xem snapshot 03/11). Người duyệt: NHÂN VIÊN.');
-    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div><p>Nhân viên Shopee đã xem hồ sơ và <b>từ chối</b> yêu cầu đơn #B02. Lý do nhân viên ghi sẽ hiện trong mục Trả hàng/Hoàn tiền. Nếu bạn có thêm bằng chứng, bấm "Gặp nhân viên" để khiếu nại lại.</p>`);
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div><p>Nhân viên Shopee đã xem hồ sơ và <b>từ chối</b> yêu cầu đơn #B02. Lý do nhân viên ghi sẽ hiện trong mục Trả hàng/Hoàn tiền. Nếu bạn có thêm bằng chứng, bấm "Chuyển nhân viên (SLA 24h)" để khiếu nại lại.</p>`);
   },
 
   /* ---------- K2 ---------- */
@@ -387,10 +389,10 @@ function actionBar(){
       <div class="row">
         <button class="btn primary" data-act="k1_confirm">Xác nhận trả hàng hoàn tiền ${mk('B','a')}</button>
         <button class="btn" data-act="k1_feedback">Chỉ gửi phản ánh, giữ hàng</button>
-        <button class="btn ghost" data-act="ask_human">Gặp nhân viên ${mk('C','a')}</button>
+        <button class="btn ghost" data-act="ask_human">Chuyển nhân viên (SLA 24h) ${mk('C','a')}</button>
       </div></div>`;
     if(c.step==='fb' || c.step==='undone') return `<div class="actionbar">${head('Hạn trả hàng đến 23:59 15/11')}
-      <div class="row"><button class="btn primary" data-act="k1_confirm">Tạo yêu cầu trả hàng</button><button class="btn ghost" data-act="ask_human">Gặp nhân viên</button></div></div>`;
+      <div class="row"><button class="btn primary" data-act="k1_confirm">Tạo yêu cầu trả hàng</button><button class="btn ghost" data-act="ask_human">Chuyển nhân viên (SLA 24h)</button></div></div>`;
     const final = c.seller==='agree' || c.staff;
     return `<div class="actionbar mk-ring">${mk(3)}${head('Trạng thái hồ sơ #B02')}
       <div class="status">
@@ -411,7 +413,7 @@ function actionBar(){
   if(c.step===1) return `<div class="actionbar mk-ring">${mk(3)}${head('Bạn muốn làm gì?')}
     <div class="row">
       <button class="btn primary" data-act="k2_confirm">Xác nhận tạo yêu cầu trả hàng ${mk('B','a')}</button>
-      <button class="btn ghost" data-act="k2_human">Gặp nhân viên ${mk('C','a')}</button>
+      <button class="btn ghost" data-act="k2_human">Chuyển nhân viên (SLA 24h) ${mk('C','a')}</button>
     </div></div>`;
   if(c.step==='undone') return `<div class="actionbar">${head('Hạn trả hàng đến 23:59 18/11')}<div class="row"><button class="btn primary" data-act="k2_confirm">Tạo lại yêu cầu trả hàng</button></div></div>`;
   const final = c.seller==='agree' || c.staff;
@@ -445,7 +447,7 @@ function renderBuyer(){
   ${actionBar()}
   <div class="composer">
     ${c.step===0 ? `<div class="line"><input readonly value="${o.buyerText.replace(/"/g,'&quot;')}"><button class="btn primary" data-act="${st.cur}_send">Gửi</button></div>`
-      : `<div class="chips"><button class="chip" data-act="ask_phone">Cho mình SĐT shop</button><button class="chip" data-act="ask_ban">Khoá shop này đi ${mk('D','a',true)}</button><button class="chip" data-act="ask_human">Gặp nhân viên</button></div>`}
+      : `<div class="chips"><button class="chip" data-act="ask_phone">Cho mình SĐT shop</button><button class="chip" data-act="ask_ban">Khoá shop này đi ${mk('D','a',true)}</button><button class="chip" data-act="ask_human">Chuyển nhân viên (SLA 24h)</button></div>`}
   </div>`;
 }
 
@@ -512,8 +514,8 @@ function renderStaff(){
     <div class="card mk-ring-a">${mk('B','a')}<h3>Quyết định dòng tiền · chỉ nhân viên sàn</h3>
       ${c.seller==='agree' ? '<div class="small">Đã xong qua làn nhanh: shop đồng ý trả hàng.</div>' : c.staff ? `<div class="small">Đã quyết: ${c.staff==='refund'?'Duyệt chi hoàn tiền':'Từ chối khiếu nại'}.</div>` : `
       <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn ok" data-act="k1_staff_refund_ask" ${unlocked?'':'disabled'}>Duyệt chi hoàn tiền 1.290.000đ</button>
-        <button class="btn danger" data-act="k1_staff_reject_ask" ${unlocked?'':'disabled'}>Từ chối khiếu nại</button>
+        <button class="btn decide" data-act="k1_staff_refund_ask" ${unlocked?'':'disabled'}>Duyệt chi hoàn tiền 1.290.000đ</button>
+        <button class="btn decide" data-act="k1_staff_reject_ask" ${unlocked?'':'disabled'}>Từ chối khiếu nại</button>
       </div>
       ${unlocked?'<div class="small" style="margin-top:6px">Đã mở khoá: hai bên đã được nghe (L3). SLA 24h — quá hạn tự nâng lên Trưởng nhóm, không bao giờ tự hoàn.</div>':'<div class="lock">🔒 Khoá theo Luật L3: shop chưa phản hồi và chưa hết 48 giờ. Hai bên phải được nghe trước khi tiền đi.</div>'}`}
     </div>
@@ -532,10 +534,10 @@ function renderStaff(){
   <div class="card mk-ring-a">${mk('B','a')}<h3>Quyết định dòng tiền · chỉ nhân viên sàn</h3>
     ${c.seller==='agree' ? '<div class="small">Đã xong qua làn nhanh: shop đồng ý trả hàng.</div>' : c.staff ? `<div class="small">Đã quyết: ${c.staff==='refund'?'Duyệt chi hoàn tiền':'Từ chối khiếu nại — giải ngân cho shop'}.</div>` : `
     <div style="display:flex;gap:6px;flex-wrap:wrap">
-      <button class="btn danger" data-act="k2_staff_reject_ask" ${unlocked?'':'disabled'}>Từ chối khiếu nại — giải ngân 890.000đ cho shop</button>
-      <button class="btn ok" data-act="k2_staff_refund_ask" ${unlocked?'':'disabled'}>Duyệt chi hoàn tiền</button>
+      <button class="btn decide" data-act="k2_staff_reject_ask" ${unlocked?'':'disabled'}>Từ chối khiếu nại — giải ngân 890.000đ cho shop</button>
+      <button class="btn decide" data-act="k2_staff_refund_ask" ${unlocked?'':'disabled'}>Duyệt chi hoàn tiền</button>
     </div>
-    ${unlocked?'<div class="small" style="margin-top:6px">Đã mở khoá: shop đã phản hồi (L3). SLA 24h.</div>':'<div class="lock">🔒 Khoá theo Luật L3: shop chưa phản hồi và chưa hết 48 giờ.</div>'}`}
+    ${unlocked?'<div class="small" style="margin-top:6px">Đã mở khoá: shop đã phản hồi (L3). SLA 24h.</div>'+(c.serial?'':'<div class="lock">⚠ Người mua còn hạn bổ sung ảnh đến 23:59 18/11 và chưa gửi ảnh serial thân máy. Theo §4.2: không từ chối chỉ vì thiếu bằng chứng khi người mua còn hạn bổ sung.</div>'):'<div class="lock">🔒 Khoá theo Luật L3: shop chưa phản hồi và chưa hết 48 giờ.</div>'}`}
   </div>${forbidNote()}`;
 }
 
@@ -546,7 +548,7 @@ function renderReviewer(){
   <div class="rv">${st.tab==='seller'?renderSeller():renderStaff()}</div>`;
 }
 
-const LV = {auto:['lv-auto','Tự làm'], appr:['lv-appr','Cần duyệt · người bấm'], ban:['lv-ban','Cấm'], rule:['lv-rule','Luật']};
+const LV = {auto:['lv-auto','Tự làm'], appr:['lv-appr','Cần duyệt · người bấm'], ban:['lv-ban','Cấm'], rule:['lv-rule','Luật'], sys:['lv-sys','Hệ thống · không phải tool']};
 function renderLog(){
   const rows = C().log.map(r => `<tr><td>${r.time}</td><td><code>${r.tool}</code></td><td><span class="lv ${LV[r.lv][0]}">${LV[r.lv][1]}</span></td><td>${r.note}</td></tr>`).join('');
   return `<div class="pane-h"><span class="ttl">Nhật ký tool &amp; luật</span><span class="small" style="margin-left:auto">Mỗi dòng ghi mức tự chủ theo §4.1 · AI không có tool nào tự chuyển tiền</span></div>
@@ -561,7 +563,7 @@ function renderLegend(){
     it(mk(3),'[#3] HAX G10 + G8/G9 · PAIR Errors','Thanh hành động: hỏi xác nhận 1 câu (L7), danh sách đúng ảnh còn thiếu (L4), hoàn tác, trạng thái chuyển người.'),
     it(mk('A','a'),'Tự làm → có hoàn tác','Nút "Huỷ yêu cầu / Hoàn tác nháp" huỷ bản nháp soan_de_xuat_hoan_tien.'),
     it(mk('B','a'),'Cần duyệt → có xác nhận','Người mua xác nhận tạo yêu cầu; chi_hoan_tien / tu_choi_khieu_nai chỉ ở màn hình người duyệt, có hộp xác nhận, khoá theo L3.'),
-    it(mk('C','a'),'Có đường chuyển người','"Gặp nhân viên" + trạng thái chuyen_truong_nhom kèm SLA 24h.'),
+    it(mk('C','a'),'Có đường chuyển người','Nút "Chuyển nhân viên (SLA 24h)" + trạng thái chuyen_truong_nhom kèm SLA 24h.'),
     it(mk('D','a'),'Việc cấm → không có nút','Không có nút phạt/khoá shop ở bất kỳ màn hình nào; bấm "Khoá shop này đi" → AI chuyển Bộ phận chuyên trách.')
   ].join('');
 }
@@ -578,7 +580,7 @@ function renderModal(){
     case 'k1_staff_reject': return box('Từ chối khiếu nại đơn #B02?', `<div class="flag">⚠ Mô tả đã bị sửa sau khi bán. Nếu từ chối dựa trên mô tả hiện tại (09/11) là sai Luật L1.</div>${diffCard()}${sum('1.290.000đ','người bán')}`, 'k1_staff_reject','Từ chối khiếu nại','danger', true);
     case 'k2_seller_agree': return box('Đồng ý trả hàng hoàn tiền đơn #C03?', `<p>890.000đ sẽ được hoàn cho người mua sau khi họ gửi trả tai nghe.</p>${sum('890.000đ','người mua')}`, 'k2_seller_agree','Đồng ý trả hàng','ok');
     case 'k2_staff_refund': return box('Duyệt chi hoàn tiền 890.000đ?', `${ev3()}${sum('890.000đ','người mua')}`, 'k2_staff_refund','Duyệt chi hoàn tiền','ok', true);
-    case 'k2_staff_reject': return box('Từ chối khiếu nại — giải ngân 890.000đ cho shop?', `${ev3()}<p class="small">Người mua đã được báo cụ thể còn thiếu gì (L4). ${st.k2.serial==='mismatch'?'<b style="color:var(--bad)">Lưu ý: serial thân máy khác hộp.</b>':''}</p>${sum('890.000đ','người bán')}`, 'k2_staff_reject','Từ chối khiếu nại','danger', true);
+    case 'k2_staff_reject': return box('Từ chối khiếu nại — giải ngân 890.000đ cho shop?', `${ev3()}${st.k2.serial?'':'<div class="flag">⚠ Người mua còn hạn bổ sung đến 23:59 18/11 (còn 5 ngày) và chưa gửi ảnh serial thân máy cạnh hộp. Theo §4.2, không từ chối chỉ vì thiếu bằng chứng khi người mua còn hạn bổ sung — nếu từ chối bây giờ, ghi rõ căn cứ khác ngoài việc thiếu ảnh.</div>'}<p class="small">Người mua đã được báo cụ thể còn thiếu gì (L4). ${st.k2.serial==='mismatch'?'<b style="color:var(--bad)">Lưu ý: serial thân máy khác hộp.</b>':''}</p>${sum('890.000đ','người bán')}`, 'k2_staff_reject','Từ chối khiếu nại','danger', true);
   }
   return '';
 }
