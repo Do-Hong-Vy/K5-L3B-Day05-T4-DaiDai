@@ -6,7 +6,7 @@
 | ---------------- | ----------- | ----------- |
 | Đỗ Hồng Vỹ       | 2A202604107 | §1 Lát cắt & phạm vi; §2 dữ liệu dựng + 10 kịch bản rủi ro, khoanh 2 kịch bản đắt nhất; §4 mức tự chủ cho 5 tool (thêm 1 tool đọc, tách `soan_hoan_tien`), tool khó xếp nhất, thử mức trên 3 kịch bản; quản lý repo & nộp bài |
 | Đinh Hoàng Phong | 2A202604090 | §3 Khi AI sai trên 2 kịch bản đắt nhất (K1, K2): câu chữ AI nguyên văn, lập luận chọn/loại phương án xử lý, phân loại lỗi (hệ thống / người dùng / ngữ cảnh), ánh xạ 3 nguyên tắc HAX/PAIR + Luật AI 134/2025, chỉ ra lỗi câu chữ không cứu được; §4.3 vòng tự xếp mức; §6 3 tiêu chí Pass/Fail & chấm thử; §7 kịch bản demo 4 phút & bộ 5 ca lạ |
-| Nguyễn Ánh Dương | 2A202604087 |             |
+| Nguyễn Ánh Dương | 2A202604087 | §5 Prototype: dựng `prototype/index.html` (2 màn hình Người mua · Người duyệt, bấm qua K1 và K2 từ đầu tới cuối), hiện độ chắc/bằng chứng (thẻ 2 bản mô tả, bảng 3 cột), 4 mức tự chủ trên màn hình (hoàn tác · xác nhận + khoá L3 · chuyển người · cấm không có nút), 3 ảnh đánh số `[#1]–[#3]` + `A–D`, `prototype/README.md`, lập luận cách hiện đã chọn/loại; §4.3 tự xếp mức `chi_hoan_tien`; bấm prototype khi demo |
 
 > Quy ước trong bài: **K1…K10** = mã kịch bản ở §2 · **Đơn A01…H08** = đơn hàng trong dữ liệu dựng ở §2.0 · tool viết dạng `ten_tool` đúng như bảng tool của track.
 
@@ -401,7 +401,7 @@ Mức nào cũng có một bên chịu giá:
 **Ba thành viên tự xếp trong 5 phút trước khi bàn** (theo `02-guide.md` §4.3):
 - Đỗ Hồng Vỹ: **B**, vì hai hướng sai đắt ngang nhau, mà chờ thì tiền vẫn nằm ở sàn.
 - Đinh Hoàng Phong: **A có điều kiện (tự làm khi đơn < 200.000đ hoặc khi shop đã nhắn nhận lỗi trong chat như K5; còn lại B)**, vì lo ca rõ ràng như K5 mà bắt chờ nhân viên 48h–72h thì người mua chịu thiệt vô ích. *(Sau khi bàn với Vỹ: nhận ra ngưỡng < 200.000đ vẫn thủng ở K10 do ảnh Zalo ghép được, nên đồng thuận chuyển sang **B + làn nhanh do người bán bấm "Đồng ý trả hàng" trong app** để vừa nhanh cho K5 vừa không cho AI tự chi tiền).*
-- Nguyễn Ánh Dương: _[điền phương án và lý do sau vòng xếp]_
+- Nguyễn Ánh Dương: **B**, nhìn từ phía màn hình. Nếu AI được tự chi (A), không có chỗ nào đặt được nút "hoàn tác", vì tiền đã về người mua. Khi đó màn hình chỉ còn báo kết quả, người bán không có lúc nào để được nghe (K2, K10). Với B, nút chi nằm ở **màn hình người duyệt**, kèm thẻ hai bản mô tả và bằng chứng hai bên ngay trước nút. Như vậy người bấm luôn thấy căn cứ trước khi tiền đi. Lo ngại của mình là K5 phải chờ, và nỗi lo này được giải quyết bằng làn nhanh: người bán bấm "Đồng ý trả hàng".
 
 **Cách nhóm chốt: B, cộng làn nhanh do người bán duyệt.**
 - Điểm mạnh nhất của phương án A là **ca rõ ràng không phải chờ** (K5). Nhóm giữ được điểm này mà không cần cho AI chi tiền: ở ca rõ ràng, chính **người bán** thừa nhận lỗi. Vì vậy cho người bán bấm "Đồng ý trả hàng" là đủ, tiền đi theo luồng trả hàng chuẩn và không cần chờ nhân viên.
@@ -452,9 +452,64 @@ Việc tách `soan_hoan_tien` thành **soạn (tự làm)** và **chi (cần duy
 
 > _Phụ trách: Nguyễn Ánh Dương._
 
-- Link hoặc file · công cụ · phần nào mock · có lời gọi AI thật không.
-- 1–2 ảnh có đánh số; mỗi số: thể hiện gì · nguyên tắc HAX/PAIR nào · mức tự chủ nào.
-- Quyết định: cách hiện độ chắc/bằng chứng và điều khiển mức tự chủ — đã nghĩ tới cách nào khác, vì sao chọn cách này.
+### 5.1 Link · công cụ · phần nào mock
+
+- **File:** [`prototype/index.html`](prototype/index.html). Mở thẳng bằng trình duyệt, không cài gì. Hướng dẫn bấm và bảng đánh số nằm ở [`prototype/README.md`](prototype/README.md).
+- **Công cụ:** một file HTML + CSS + JavaScript thuần, dựng bằng coding agent (Claude Code). Không dùng thư viện ngoài, không backend, không đăng nhập.
+- **Phần mock:**
+  - Dữ liệu là đơn dựng ở §2.0 (B02, C03).
+  - Câu chữ AI được viết sẵn, chép nguyên văn từ §3.1(a) và §3.2(a).
+  - Lời gọi tool chỉ được ghi vào bảng **"Nhật ký tool & luật"**, kèm mức tự chủ của từng lời gọi.
+  - Đồng hồ 48 giờ là chữ tĩnh, và có nút **"⏩ Mô phỏng hết 48 giờ"** (ghi rõ là điều khiển demo).
+  - Ảnh và chứng từ là dòng chữ giả.
+- **Lời gọi AI thật:** không có (chưa làm bonus +3).
+- **Cấu trúc:** **2 màn hình** đặt cạnh nhau. *Màn hình 1 · Người mua* là khung "Trò chuyện với Shopee". *Màn hình 2 · Người duyệt* có hai tab, *Người bán* và *Nhân viên sàn*. Màn hình 2 cũng là phần bonus "màn hình phía người bán". Bên dưới là nhật ký tool và chú thích đánh số. Chạy được **cả K1 lẫn K2**, cùng 3 ca lạ có nút sẵn (đòi SĐT, đòi khoá shop, gặp nhân viên). Ở K2 còn mô phỏng được ca lạ 4 ở §7.2: ảnh serial thân máy khớp hoặc khác serial trên hộp.
+- **Bấm qua ca khó (K1) không can thiệp tay**, mỗi bước có dải gợi ý màu vàng:
+  1. Gửi khiếu nại.
+  2. AI hiện độ chắc, hai bản mô tả và câu hỏi xác nhận.
+  3. Bấm "Xác nhận trả hàng hoàn tiền".
+  4. Ở tab Nhân viên sàn, nút tiền đang khoá.
+  5. Bấm "Mô phỏng hết 48 giờ" (hoặc ở tab Người bán bấm "Không đồng ý").
+  6. Nhân viên bấm Duyệt chi hoặc Từ chối, phải tick ô "đã xem cả hai bên" rồi mới xác nhận được.
+
+### 5.2 Ảnh có đánh số
+
+Ảnh: [`01-k1-nguoi-mua-va-nhan-vien-san.png`](prototype/img/01-k1-nguoi-mua-va-nhan-vien-san.png) · [`02-k2-bang-chung-3-cot.png`](prototype/img/02-k2-bang-chung-3-cot.png) · [`03-k1-hop-xac-nhan-duyet.png`](prototype/img/03-k1-hop-xac-nhan-duyet.png).
+
+**Số hồng 1–3 là nguyên tắc HAX/PAIR**, giữ đúng mã `[#1]–[#3]` của §3.5 để khi demo câu chữ và màn hình trỏ cùng một số. **Chữ xanh A–D là mức tự chủ ở §4.**
+
+| Mã | Ảnh | Thể hiện gì trên màn hình | Nguyên tắc HAX/PAIR | Mức tự chủ (§4) |
+|---|---|---|---|---|
+| **1** | 01, 02 | Dải đầu khung chat "**Trợ lý AI Shopee** · Tự đối chiếu mô tả lúc đặt & chuẩn bị hồ sơ · **Quyết định tiền do Người bán / Nhân viên duyệt**". Huy hiệu ở đầu tin AI: K1 có *"Phát hiện lệch phiên bản mô tả · khớp log 100%"*, *"Hạn trả hàng: còn 2 ngày (15/11)"*, *"Kết luận đúng/sai mô tả: nhân viên duyệt"*; K2 có *"Độ chắc: Thấp · bằng chứng hai bên mâu thuẫn"*. Ô "Đề xuất của AI" ở màn hình nhân viên có cùng huy hiệu độ chắc | **G1** (nói rõ AI làm được gì, không làm gì) · **G2** (AI chắc tới đâu) · Luật AI 134/2025 Đ.11 k.1 (xưng là AI) | Nói trước việc gì AI tự làm, việc gì người duyệt |
+| **2** | 01, 02, 03 | **K1:** thẻ hai cột *"Mô tả lúc đặt · snapshot 03/11: dung tích 6 lít"* (viền xanh, ghi "Căn cứ so sánh – L1") cạnh *"Mô tả hiện tại · sửa 09/11"*, phần thêm sau khi bán được **tô vàng**. **K2:** bảng 3 cột *Mô tả lúc đặt / Bằng chứng người bán / Bằng chứng người mua*: câu "fake 100%" có nhãn xám "nhận định · không tính là căn cứ (L2)", ảnh còn thiếu là **ô trống viền đỏ đứt** | **G11** (giải thích vì sao) · **PAIR Explainability + Trust** (người dùng tự kiểm được căn cứ, tin đúng mức) | Là thứ người duyệt phải thấy **trước** khi bấm `chi_hoan_tien` / `tu_choi_khieu_nai` (§4.2) |
+| **3** | 01, 02 | Thanh hành động dưới khung chat. Ở lượt đầu là câu hỏi xác nhận một lần (L7): *"Xác nhận trả hàng hoàn tiền / Chỉ gửi phản ánh, giữ hàng / Gặp nhân viên"*. Ở K2 là danh sách đúng **2 ảnh còn thiếu**, gửi xong ảnh nào thì tick ✓ ảnh đó (L4). Sau khi xác nhận, thanh chuyển thành "Trạng thái hồ sơ": ghi nhận trong hạn · bản nháp chưa chuyển tiền · chờ shop 48h rồi nhân viên 24h · tiền giữ tại sàn | **G10** (thu hẹp khi nghi ngờ: hỏi 1 câu, xin đúng thứ thiếu) · **G8/G9** (gạt bỏ, sửa dễ) · **PAIR Errors + Graceful Failure** | Chứa A, B, C phía người mua |
+| **A** | 01 | Nút **"↩ Huỷ yêu cầu / Hoàn tác nháp"** (K1) và "↩ Huỷ yêu cầu khiếu nại" (K2). Bấm một lần là huỷ bản nháp, rút hồ sơ khỏi hàng đợi, báo shop, và nhật ký ghi *"HOÀN TÁC… không có tiền nào di chuyển"*. Khi người duyệt đã quyết, nút bị mờ kèm dòng *"Tiền đã được người có thẩm quyền quyết → không còn hoàn tác ở đây"* | G8/G9 | **Tự làm có hoàn tác:** `soan_de_xuat_hoan_tien` |
+| **B** | 01, 02, 03 | (1) Người mua bấm xác nhận trước khi AI tạo yêu cầu (L7). (2) Tab Người bán có ô *"Quyết định của shop"*: "Đồng ý trả hàng" (làn nhanh, có hộp xác nhận) và "Không đồng ý / Gửi giải trình", **không có** nút từ chối khiếu nại. (3) Tab Nhân viên sàn có ô *"Quyết định dòng tiền · chỉ nhân viên sàn"*: hai nút **khoá mờ kèm dòng "🔒 Khoá theo Luật L3"** cho tới khi shop phản hồi hoặc hết 48h. Bấm vào thì mở hộp xác nhận hiện lại bằng chứng, ghi "khó đảo", và **phải tick "đã xem cả hai bên"** thì nút mới bấm được. Riêng "Từ chối" ở K1 có thêm cảnh báo đỏ "Mô tả đã bị sửa sau khi bán…" | G2, G11 | **Cần duyệt có xác nhận:** `chi_hoan_tien` (người bán hoặc nhân viên), `tu_choi_khieu_nai` (chỉ nhân viên) |
+| **C** | 01, 02 | Nút **"Gặp nhân viên"** ở lượt đầu và trong khung chat; dòng trạng thái *"Đã chuyển Trưởng nhóm · cờ ưu tiên 'mô tả sửa sau khi bán'"* (K1) và *"Đã chuyển nhân viên sàn (24h)"* (K2), luôn kèm **thời gian thật**, không ghi "ngay lập tức". Màn hình nhân viên có cờ đỏ *"🚩 Ưu tiên: Mô tả sửa sau khi bán · chuyển theo điều kiện (a)"* | G10, PAIR Graceful Failure | **Tự làm, bắt buộc chuyển:** `chuyen_truong_nhom` |
+| **D** | 01, 02 | Ô viền đứt ở cuối **mọi** tab người duyệt: *"Không có nút phạt / khoá shop, không có nút 'báo hàng giả & phạt', không hiện SĐT / địa chỉ…"*. Chip ca lạ **"Khoá shop này đi"**: AI trả lời không có quyền phạt, chuyển Bộ phận chuyên trách, và nhật ký ghi `phat_shop` **Cấm** | G1 (nói rõ giới hạn) | **Cấm, không có nút:** `phat_shop`; L5 không SĐT |
+
+### 5.3 Lập luận: cách hiện đã chọn, cách khác đã nghĩ tới và vì sao loại
+
+| Quyết định | Đã chọn | Đã nghĩ tới và loại, vì sao |
+|---|---|---|
+| **Hiện độ chắc thế nào** (`[#1]`) | **Huy hiệu bằng chữ, tách hai ý**: *độ chắc về dữ liệu* ("khớp log phiên bản 100%") và *ai kết luận* ("Kết luận đúng/sai mô tả: nhân viên duyệt"). K2 ghi thẳng "Độ chắc: Thấp · bằng chứng hai bên mâu thuẫn" | **Phần trăm tổng (ví dụ "AI chắc 87%")**: loại. Người mua sẽ đọc thành "87% được hoàn", người bán đọc thành "87% thua". Con số không cho biết chắc **về điều gì**. Ở K1, AI chắc chắn **mô tả đã bị sửa** nhưng không có quyền kết luận **hàng sai mô tả**, mà một con số gộp thì xoá mất khác biệt đó. **Thanh màu xanh/đỏ không chữ**: loại, vì đỏ dễ bị đọc thành "người bán gian lận", trái với nguyên tắc trung lập ở §1 |
+| **Hiện bằng chứng thế nào** (`[#2]`) | **Thẻ đặt cạnh nhau, ngay trong tin AI**, phần sửa tô vàng, bản dùng làm căn cứ có viền xanh. Màn hình người mua, người bán và nhân viên dùng **cùng một thẻ** | **Chỉ viết thành câu** ("mô tả lúc đặt ghi…, hiện tại ghi…"): loại. Câu dài, người duyệt phải tự so từng chữ, mà lỗi K1 chính là lỗi "trông đúng vì trích đúng chữ" (§3.6). **Link "Xem lịch sử mô tả" mở trang khác**: loại, vì người duyệt bận sẽ không bấm, và trang sản phẩm hiện tại lại chính là bản đã sửa. **Mỗi bên một màn hình khác nhau**: loại, vì người mua và nhân viên phải nhìn cùng một căn cứ thì khi nhân viên quyết, người mua mới hiểu vì sao |
+| **Đặt nút tiền ở đâu** (B) | Nút `chi_hoan_tien` / `tu_choi_khieu_nai` **chỉ ở Màn hình 2** (người duyệt). Khung chat của AI không có nút nào chuyển tiền. Nút **hiện nhưng khoá mờ**, kèm lý do L3 | **Nút "Hoàn tiền ngay" trong chat để người mua tự bấm**: loại, vì người mua là bên đang tranh chấp (§1 ràng buộc prototype). **Giấu hẳn nút cho tới khi hết 48h**: loại, vì nhân viên sẽ không biết vì sao chưa làm được và phải hỏi. Nút khoá kèm một dòng lý do nói rõ cả *luật* lẫn *khi nào mở* |
+| **Xác nhận khi duyệt** (B) | Hộp xác nhận hiện **lại** bằng chứng, ghi "khó đảo" kèm số tiền, **bắt tick "đã xem cả hai bên"**. Nút Từ chối ở K1 thêm cảnh báo mô tả bị sửa | **Hộp "Bạn chắc chứ? Có / Không"**: loại, vì người ta bấm "Có" theo phản xạ, không chặn được lỗi K1. Ô tick buộc người duyệt nhìn lại thẻ `[#2]` trước khi tiền đi |
+| **Hoàn tác** (A) | **Nút huỷ luôn nằm trên thanh trạng thái**, bấm một lần là xong, không cần ai duyệt. Khi tiền đã được người duyệt quyết thì nút mờ đi kèm lý do | **Toast "Hoàn tác trong 10 giây"**: loại. Người mua ở K1 có thể đo lại nồi sau vài giờ mới đổi ý (§7.2 ca lạ 1), mà bản nháp không làm ai mất tiền nên không có lý do giới hạn thời gian |
+| **Việc cấm** (D) | **Không có nút ở bất kỳ màn hình nào.** Khi người mua đòi thì AI trả lời đi đâu (Bộ phận chuyên trách) và nhật ký ghi `phat_shop` = Cấm | **Nút "Khoá shop" bị khoá mờ**: loại. Nút mờ vẫn gợi ý "có thể làm được nếu đủ điều kiện", dễ thành lời hứa ngầm (K7 "hứa phạt shop"). Cấm thì không có nút, đúng như §4.2 |
+| **Cho thấy mức tự chủ khi demo** | Bảng **"Nhật ký tool & luật"** ghi từng lời gọi kèm nhãn *Tự làm / Cần duyệt · người bấm / Cấm / Luật* | **Chỉ nói miệng khi demo**: loại, vì TA hỏi "hành động này ở mức nào?" thì phải chỉ vào được. Nhật ký cho thấy AI không bao giờ có dòng `chi_hoan_tien` mà người bấm là AI |
+
+**Khi gặp ca lạ chưa chuẩn bị**, prototype có 3 đường đi sẵn, đều không phải đường bế tắc:
+1. Chip **"Gặp nhân viên"** → `chuyen_truong_nhom` kèm SLA 24h.
+2. Chip **"Khoá shop"** → chuyển Bộ phận chuyên trách.
+3. Chip **"SĐT shop"** → từ chối theo L5 nhưng vẫn chỉ đường chat trong app.
+
+Hai nút tiền **không bao giờ** nằm trong khung chat, nên dù ca lạ đi theo hướng nào thì AI cũng không chuyển tiền được.
+
+**Giới hạn còn lại của prototype:**
+- Chưa có lời gọi AI thật: câu chữ là cố định, nên prototype không chứng minh được model thật sẽ luôn so với snapshot.
+- Chưa dựng luồng K4 (chọn đơn bằng 3 thẻ) và luồng K5 (làn nhanh trọn vẹn). Hai luồng này chỉ được mô tả ở §4.4.
 
 ---
 

@@ -36,7 +36,7 @@
 - [x] Khoanh **2 kịch bản đắt nhất** + lý do vì sao đắt hơn + kịch bản **suýt được chọn** và vì sao không.
 
 **§4 Mức tự chủ (R4 · 25đ) — mốc M2, phút 125**
-- [ ] Tổ chức bước "mỗi người tự xếp mức 5 tool trong 5', không bàn" → ghi lại **ai chọn gì**. _(Đã viết sẵn phương án của Vỹ và Phong trong spec.md §4.3; **còn thiếu lựa chọn của Dương**.)_
+- [x] Tổ chức bước "mỗi người tự xếp mức 5 tool trong 5', không bàn" → ghi lại **ai chọn gì**. _(spec.md §4.3 đã đủ phương án của Vỹ, Phong và Dương.)_
 - [x] Với **từng tool** trong 5 tool: mức (tự làm / cần người duyệt / cấm) · sai thì ai chịu gì · đảo được không · chờ người thì mất gì · phương án đã loại. Nếu cần duyệt: **ai duyệt, thấy gì, quá hạn thì sao**.
 - [x] **Tool khó xếp nhất** (gần như chắc là `soan_hoan_tien` hoặc `tu_choi_khieu_nai`): cái giá mỗi phía trỏ về kịch bản §2, nhóm chốt thế nào.
 - [x] **Thử mức** trên 2 kịch bản đắt nhất + 1 kịch bản bình thường (ca áo size L→M, shop đã nhận gửi nhầm) theo 3 câu: sai có bị chặn? còn làm khi lẽ ra phải hỏi? người bình thường có phải chờ vô ích?
@@ -45,7 +45,7 @@
 
 **Repo & nộp bài**
 - [x] Repo `K5-L3B-Day05-T4-DaiDai` đã tạo; copy `03-spec-template.md` → `spec.md`, điền bảng thành viên + **mã HV đúng**.
-- [ ] Cuối buổi: điền cột "Việc đã làm" cho Dương (của Vỹ và Phong đã điền), điền Bàn/zone, kiểm tra mở repo bằng cửa sổ ẩn danh, nộp link.
+- [ ] Cuối buổi: ~~điền cột "Việc đã làm" cho Dương~~ (đã điền), điền Bàn/zone, kiểm tra mở repo bằng cửa sổ ẩn danh, nộp link.
 
 ---
 
@@ -72,16 +72,17 @@
 
 ### Nguyễn Ánh Dương — Prototype
 
-**§5 Prototype (R5 · 25đ) — mốc M3, phút 200**
-- [ ] Chọn công cụ trước giờ lab (HTML + coding agent là nhanh nhất; tham khảo `prototype-sample/index.html` 3 phút rồi đóng, không chép giao diện).
-- [ ] Trong lúc nhóm làm chặng 2–4: dựng sẵn khung chat "Trò chuyện với Shopee" + thẻ đơn hàng (dữ liệu giả).
-- [ ] **1–2 màn hình** cho ca khó nhất (ca demo bắt buộc: người bán đúng / mô tả đã bị sửa), **bấm từ đầu tới cuối không can thiệp tay**.
-- [ ] Hiện **độ chắc / bằng chứng**: VD đặt cạnh nhau "mô tả lúc đặt" vs "mô tả hiện tại" vs ảnh người mua gửi.
-- [ ] Hiện **≥2 mức tự chủ** đúng như §4 của Vỹ: tự làm có **hoàn tác** · cần duyệt có **nút xác nhận + người duyệt thấy gì** · có **đường chuyển người** · việc cấm **không có nút**.
-- [ ] Mỗi nguyên tắc HAX/PAIR Phong chọn phải **chỉ được vào một chỗ** trên màn hình.
-- [ ] Chụp **1–2 ảnh có đánh số** các chỗ, bỏ vào `prototype/` kèm `README.md` (link hoặc file HTML).
-- [ ] Viết §5 trong `spec.md`: link · công cụ · phần nào mock · ảnh đánh số (mỗi số: thể hiện gì, nguyên tắc nào, mức tự chủ nào) · **cách hiện đã chọn, cách khác đã nghĩ tới và vì sao loại** (4đ).
-- [ ] **Bonus (nếu kịp)**: màn hình phía người bán (thấy khiếu nại + hạn phản hồi); hoặc 1 lời gọi AI thật so khiếu nại với mô tả lúc đặt — **chỉ dữ liệu dựng, API key để biến môi trường, không commit**.
+**§5 Prototype (R5 · 25đ) — mốc M3, phút 200** · _Sản phẩm: [`prototype/index.html`](prototype/index.html), [`prototype/README.md`](prototype/README.md), ảnh `prototype/img/01–03`, spec.md §5 + §4.3._
+- [x] Chọn công cụ trước giờ lab (HTML + coding agent là nhanh nhất; tham khảo `prototype-sample/index.html` 3 phút rồi đóng, không chép giao diện).
+- [x] Trong lúc nhóm làm chặng 2–4: dựng sẵn khung chat "Trò chuyện với Shopee" + thẻ đơn hàng (dữ liệu giả).
+- [x] **1–2 màn hình** cho ca khó nhất (ca demo bắt buộc: người bán đúng / mô tả đã bị sửa), **bấm từ đầu tới cuối không can thiệp tay**.
+- [x] Hiện **độ chắc / bằng chứng**: VD đặt cạnh nhau "mô tả lúc đặt" vs "mô tả hiện tại" vs ảnh người mua gửi.
+- [x] Hiện **≥2 mức tự chủ** đúng như §4 của Vỹ: tự làm có **hoàn tác** · cần duyệt có **nút xác nhận + người duyệt thấy gì** · có **đường chuyển người** · việc cấm **không có nút**.
+- [x] Mỗi nguyên tắc HAX/PAIR Phong chọn phải **chỉ được vào một chỗ** trên màn hình.
+- [x] Chụp **1–2 ảnh có đánh số** các chỗ, bỏ vào `prototype/` kèm `README.md` (link hoặc file HTML).
+- [x] Viết §5 trong `spec.md`: link · công cụ · phần nào mock · ảnh đánh số (mỗi số: thể hiện gì, nguyên tắc nào, mức tự chủ nào) · **cách hiện đã chọn, cách khác đã nghĩ tới và vì sao loại** (4đ).
+- [x] **Bonus (nếu kịp)**: màn hình phía người bán (thấy khiếu nại + hạn phản hồi) — _đã có (Màn hình 2, tab Người bán + Nhân viên sàn)_.
+- [ ] Bonus +3: 1 lời gọi AI thật so khiếu nại với mô tả lúc đặt — **chỉ dữ liệu dựng, API key để biến môi trường, không commit**. _(chưa làm)_
 - [ ] Kẹt kỹ thuật > 20 phút → gọi TA.
 
 ---
@@ -110,7 +111,7 @@
 
 - [ ] Repo `K5-L3B-Day05-T4-<TenNhom>` công khai, mở được bằng cửa sổ ẩn danh.
 - [ ] `spec.md` đủ §1–§7, bảng thành viên ở đầu, **mã HV đúng**, cột "Việc đã làm" ghi cụ thể.
-- [ ] `prototype/` có link hoặc file + 1–2 ảnh đánh số.
+- [x] `prototype/` có link hoặc file + 1–2 ảnh đánh số.
 - [ ] Không có dữ liệu thật, không có API key trong code.
 - [ ] **Mỗi người trả lời được 3 câu**: "Hành động này sai thì ai mất gì?" · "Lỗi nguy hiểm nhất là gì?" · "Phần bạn làm là gì?" — và chỉ được "chỗ nào trên màn hình là G__".
 - [ ] Cân nhắc **xung phong demo trước lớp** (+5 bonus).

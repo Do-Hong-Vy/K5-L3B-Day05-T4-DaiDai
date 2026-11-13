@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trợ lý khiếu nại AI</title>
+<style>
+:root{
+  --bg:#f4f1ee; --panel:#ffffff; --ink:#1f1d1b; --muted:#6b655f; --line:#e3ddd6;
+  --accent:#e2552b; --accent-soft:#fdebe4;
+  --ok:#1f7a4d; --ok-soft:#e3f4ea; --warn:#a15c00; --warn-soft:#fff1d6;
+  --bad:#b42318; --bad-soft:#fde7e5; --info:#1d4ed8; --info-soft:#e4ecff;
+  --grey-soft:#efedeb; --hl:#ffe58a;
+  --mk-p:#d6336c; --mk-a:#2457d6;
+}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+button{font:inherit;cursor:pointer}
+header.top{position:sticky;top:0;z-index:20;background:var(--ink);color:#fff;padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+header.top h1{font-size:15px;margin:0 12px 0 0;font-weight:600}
+.seg{display:inline-flex;background:#ffffff1a;border-radius:8px;padding:2px}
+.seg button{background:none;border:0;color:#fff;padding:6px 10px;border-radius:6px}
+.seg button.on{background:#fff;color:var(--ink);font-weight:600}
+.tbtn{background:#ffffff1a;border:1px solid #ffffff33;color:#fff;border-radius:8px;padding:6px 10px}
+.tbtn.on{background:var(--mk-p);border-color:var(--mk-p)}
+.note-mock{font-size:12px;color:#ffffffb0;margin-left:auto}
+.guide{background:var(--warn-soft);border-bottom:1px solid #f0d9a8;padding:8px 16px;font-size:13px}
+.guide b{color:var(--warn)}
+main{display:grid;grid-template-columns:minmax(340px,430px) 1fr;gap:16px;padding:16px;max-width:1500px;margin:0 auto}
+@media (max-width:900px){main{grid-template-columns:1fr}}
+.pane{background:var(--panel);border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;position:relative}
+.pane-h{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.pane-h .ttl{font-weight:700}
+.screen-tag{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.ai-banner{background:var(--info-soft);padding-right:30px;color:#173a99;font-size:12px;padding:7px 14px;border-bottom:1px solid #cfdcff;position:relative}
+.order{margin:10px 12px;border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;gap:10px;align-items:center;position:relative}
+.thumb{width:44px;height:44px;border-radius:8px;background:var(--grey-soft);display:grid;place-items:center;font-size:22px;flex:none}
+.order .meta{flex:1;min-width:0}
+.order .nm{font-weight:600}
+.small{font-size:12px;color:var(--muted)}
+.chat{flex:1;overflow:auto;padding:4px 12px 12px;max-height:620px;min-height:300px}
+body.shot .chat{max-height:none;overflow:visible}
+.msg{margin:10px 0;max-width:92%;position:relative}
+.msg.buyer{margin-left:auto;background:var(--accent);color:#fff;border-radius:14px 14px 4px 14px;padding:8px 12px;max-width:80%}
+.msg.ai{background:#f7f6f4;border:1px solid var(--line);border-radius:14px 14px 14px 4px;padding:10px 12px}
+.msg.sys{max-width:100%;text-align:center;font-size:12px;color:var(--muted);background:none}
+.msg p{margin:6px 0}
+.ai-id{font-size:12px;font-weight:700;color:var(--info);display:flex;align-items:center;gap:6px}
+.ai-id::before{content:"AI";background:var(--info);color:#fff;border-radius:4px;padding:0 4px;font-size:10px}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0;position:relative}
+.badge{display:inline-block;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:600;border:1px solid transparent}
+.b-warn{background:var(--warn-soft);color:var(--warn);border-color:#f0d9a8}
+.b-ok{background:var(--ok-soft);color:var(--ok);border-color:#bfe3cf}
+.b-bad{background:var(--bad-soft);color:var(--bad);border-color:#f6c5c0}
+.b-info{background:var(--info-soft);color:var(--info);border-color:#cfdcff}
+.b-grey{background:var(--grey-soft);color:var(--muted);border-color:var(--line)}
+.diff{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0;position:relative}
+.diff .col{border:1px solid var(--line);border-radius:8px;padding:8px;background:#fff;font-size:13px}
+.diff .col h4{margin:0 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
+.diff .col.base{border-color:#bfe3cf;background:#f6fcf8}
+.diff .col.base h4{color:var(--ok)}
+mark{background:var(--hl);padding:0 2px;border-radius:3px}
+.src{font-size:11px;color:var(--muted);border-top:1px dashed var(--line);margin-top:6px;padding-top:4px}
+.ev3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0;position:relative}
+.ev3 .col{border:1px solid var(--line);border-radius:8px;padding:8px;font-size:12.5px;background:#fff}
+.ev3 .col h4{margin:0 0 4px;font-size:11px;text-transform:uppercase;color:var(--muted)}
+.ev3 .ok{color:var(--ok);font-weight:600}
+.ev3 .miss{color:var(--bad);font-weight:600}
+.slot{border:1.5px dashed #e7a39a;border-radius:6px;padding:4px 6px;margin-top:4px;color:var(--bad);font-size:12px}
+.checklist{margin:6px 0;padding:0;list-style:none;position:relative}
+.checklist li{padding:4px 0 4px 24px;position:relative}
+.checklist li::before{content:"○";position:absolute;left:4px;color:var(--bad);font-weight:700}
+.checklist li.done::before{content:"✓";color:var(--ok)}
+.l2{font-size:12px;background:var(--grey-soft);border-radius:6px;padding:4px 8px;margin:6px 0;color:var(--muted)}
+.actionbar{border-top:1px solid var(--line);background:#fbfaf9;padding:10px 12px;position:relative}
+.actionbar .row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.ab-title{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);display:flex;gap:6px;align-items:center}
+.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 11px;font-weight:600;position:relative}
+.btn:hover{border-color:#bdb5ad}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn.danger{background:#fff;border-color:var(--bad);color:var(--bad)}
+.btn.ghost{background:none;border-style:dashed}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.status{display:flex;flex-direction:column;gap:4px;font-size:12.5px}
+.status div::before{content:"● ";color:var(--ok)}
+.status div.wait::before{color:var(--warn)}
+.composer{border-top:1px solid var(--line);padding:8px 12px;display:flex;flex-direction:column;gap:6px}
+.composer .line{display:flex;gap:6px}
+.composer input{flex:1;border:1px solid var(--line);border-radius:999px;padding:7px 12px;font:inherit;background:#fff;color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:3px 10px;font-size:12px}
+.chip::before{content:"ca lạ · ";color:var(--muted)}
+.tabs{display:flex;gap:4px;padding:8px 12px 0;border-bottom:1px solid var(--line)}
+.tabs button{border:1px solid var(--line);border-bottom:0;background:var(--grey-soft);padding:7px 12px;border-radius:8px 8px 0 0;font-weight:600;color:var(--muted)}
+.tabs button.on{background:#fff;color:var(--ink);margin-bottom:-1px}
+.rv{padding:14px;display:flex;flex-direction:column;gap:12px}
+.card{border:1px solid var(--line);border-radius:10px;padding:12px;position:relative;background:#fff}
+.card h3{margin:0 0 6px;font-size:14px}
+.flag{background:var(--bad-soft);color:var(--bad);border:1px solid #f6c5c0;border-radius:8px;padding:6px 10px;font-weight:600;font-size:13px}
+.lock{font-size:12px;color:var(--warn);background:var(--warn-soft);border-radius:6px;padding:6px 8px;margin-top:8px}
+.held{font-size:13px;background:var(--ok-soft);color:var(--ok);border-radius:8px;padding:6px 10px;font-weight:600}
+.forbid{font-size:12px;color:var(--muted);border:1px dashed var(--line);border-radius:8px;padding:8px 10px;position:relative}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;color:var(--warn)}
+.demo-ctl{font-size:12px;border:1px dashed #c9b88f;background:#fffaf0;border-radius:8px;padding:8px 10px}
+.demo-ctl b{color:var(--warn)}
+.empty{color:var(--muted);text-align:center;padding:30px 10px}
+.log{grid-column:1/-1}
+.log table{width:100%;border-collapse:collapse;font-size:12.5px}
+.log th,.log td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.log th{font-size:11px;text-transform:uppercase;color:var(--muted)}
+.lv{font-weight:700;font-size:11px;border-radius:4px;padding:1px 6px;white-space:nowrap}
+.lv-auto{background:var(--ok-soft);color:var(--ok)}
+.lv-appr{background:var(--warn-soft);color:var(--warn)}
+.lv-ban{background:var(--bad-soft);color:var(--bad)}
+.lv-rule{background:var(--info-soft);color:var(--info)}
+code{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:var(--grey-soft);padding:0 4px;border-radius:4px}
+.legend{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;font-size:12.5px}
+.legend .it{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;display:flex;gap:8px}
+/* numbered markers */
+.mk{display:none;position:absolute;top:-9px;right:-9px;z-index:5;width:22px;height:22px;border-radius:50%;color:#fff;font-weight:800;font-size:12px;align-items:center;justify-content:center;box-shadow:0 0 0 2px #fff,0 2px 6px #0004}
+.mk.p{background:var(--mk-p)} .mk.a{background:var(--mk-a)}
+.mk.inl{position:static;display:none;flex:none}
+body.marks .mk{display:flex}
+body.marks .mk.inl{display:inline-flex;vertical-align:middle;margin-left:4px;box-shadow:none}
+body.marks .mk-ring{outline:2px dashed var(--mk-p);outline-offset:2px}
+body.marks .mk-ring-a{outline:2px dashed var(--mk-a);outline-offset:2px}
+.legend .mk{display:flex;position:static;flex:none}
+/* modal */
+.ov{position:fixed;inset:0;background:#0007;display:grid;place-items:center;z-index:50;padding:16px}
+.modal{background:#fff;border-radius:14px;max-width:560px;width:100%;padding:18px;position:relative;max-height:90vh;overflow:auto}
+.modal h3{margin:0 0 8px}
+.modal > .mk{top:10px;right:10px}
+.modal .row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:13px;margin-top:10px;background:var(--warn-soft);padding:8px;border-radius:8px}
+</style>
+</head>
+<body class="marks">
+<header class="top">
+  <h1>Trò chuyện với Shopee · Trợ lý khiếu nại "không đúng mô tả"</h1>
+  <div class="seg" id="caseSeg">
+    <button data-act="case" data-v="k1">K1 · Đơn B02 · mô tả bị sửa</button>
+    <button data-act="case" data-v="k2">K2 · Đơn C03 · người bán đúng</button>
+  </div>
+  <button class="tbtn" id="mkBtn" data-act="marks">Số đánh dấu: BẬT</button>
+  <button class="tbtn" data-act="reset">↺ Làm lại ca này</button>
+  <span class="note-mock">Dữ liệu dựng · hôm nay 13/11/2026 · không có backend</span>
+</header>
+<div class="guide" id="guide"></div>
+<main>
+  <section class="pane" id="buyer"></section>
+  <section class="pane" id="reviewer"></section>
+  <section class="pane log" id="log"></section>
+  <section class="legend" id="legend"></section>
+</main>
+<div id="modalRoot"></div>
+
+<script>
+/* ===== Dữ liệu dựng (spec.md §2.0) — không phải dữ liệu thật ===== */
+const ORDERS = {
+  k1:{id:'B02', name:'Nồi chiên không dầu', price:'1.290.000đ', icon:'🍳', received:'08/11', deadline:'23:59 15/11/2026', left:'còn 2 ngày',
+      buyerText:'Nồi chiên ghi 6 lít mà mình đo lòng nồi chỉ được 5 lít. Không đúng mô tả.'},
+  k2:{id:'C03', name:'Tai nghe bluetooth', price:'890.000đ', icon:'🎧', received:'11/11', deadline:'23:59 18/11/2026', left:'còn 5 ngày',
+      buyerText:'Tai nghe này fake 100%, tem mờ, khác hẳn cái mình thấy ở cửa hàng chính hãng. Hoàn tiền ngay cho mình.'}
+};
+const fresh = () => ({
+  k1:{step:0, msgs:[], log:[], photo:false, seller:null, hours:0, staff:null},
+  k2:{step:0, msgs:[], log:[], tem:false, serial:null, seller:null, staff:null}
+});
+let st = Object.assign({cur:'k1', tab:'seller', marks:true, modal:null}, fresh());
+let clock = 48; // phút giả lập, chỉ để log có giờ khác nhau
+const C = () => st[st.cur];
+const O = () => ORDERS[st.cur];
+const mk = (n, t='p', inl=false) => `<span class="mk ${t}${inl?' inl':''}">${n}</span>`;
+const t = () => { clock += 1; return `09:${String(clock).padStart(2,'0')}`; };
+function log(tool, lv, note){ C().log.push({time:t(), tool, lv, note}); }
+function say(who, html){ C().msgs.push({who, html}); }
+
+/* ===== Mẩu giao diện dùng lại ===== */
+const diffCard = () => `
+<div class="diff mk-ring">${mk(2)}
+  <div class="col base"><h4>Mô tả lúc đặt · snapshot 03/11</h4>"Nồi chiên không dầu <b>dung tích 6 lít</b>"<div class="src">Căn cứ so sánh (Luật L1)</div></div>
+  <div class="col"><h4>Mô tả hiện tại · sửa 09/11</h4>"Nồi chiên không dầu 6 lít <mark>(dung tích tổng), lòng nồi 5 lít</mark>"<div class="src">Shop sửa <b>sau khi bán</b> → không dùng để bác khiếu nại</div></div>
+</div>`;
+
+function ev3(viewer){
+  const c = st.k2;
+  const sellerCol = c.seller==='evidence'
+    ? `<span class="ok">Đã nộp · khớp mô tả</span><br>• Hoá đơn nhập từ nhà phân phối<br>• Ảnh quét QR → serial <b>SN-884920</b> = serial in trên hộp`
+    : `<span class="small">Chưa phản hồi (còn 48 giờ)</span>`;
+  let serialLine;
+  if (c.serial==='match') serialLine = `<span class="ok">✓ Serial thân máy SN-884920 = hộp</span>`;
+  else if (c.serial==='mismatch') serialLine = `<span class="miss">⚠ Serial thân máy SN-111111 ≠ hộp SN-884920</span>`;
+  else serialLine = `<div class="slot">Còn thiếu: ảnh serial trên thân tai nghe đặt cạnh vỏ hộp</div>`;
+  const temLine = c.tem ? `<span class="ok">✓ Ảnh tem cận cảnh</span>` : `<div class="slot">Còn thiếu: ảnh tem bảo hành cận cảnh</div>`;
+  return `
+<div class="ev3 mk-ring">${mk(2)}
+  <div class="col"><h4>Mô tả lúc đặt</h4>"Hàng phân phối chính thức, <b>tem bảo hành nhà phân phối, mã QR tra cứu serial</b>"</div>
+  <div class="col"><h4>Bằng chứng người bán</h4>${sellerCol}</div>
+  <div class="col"><h4>Bằng chứng người mua</h4>Phản ánh: "tem mờ, khác hàng ở cửa hàng" <span class="badge b-grey">nhận định · không tính là căn cứ (L2)</span><br>${temLine}<br>${serialLine}</div>
+</div>`;
+}
+
+/* ===== Hành động ===== */
+const A = {
+  case(v){ st.cur=v; st.modal=null; },
+  marks(){ st.marks=!st.marks; },
+  tab(v){ st.tab=v; },
+  reset(){ st[st.cur]=fresh()[st.cur]; st.modal=null; },
+  close(){ st.modal=null; },
+
+  /* ---------- K1 ---------- */
+  k1_send(){ const c=st.k1; if(c.step) return; c.step=1;
+    say('buyer', O().buyerText);
+    log('xem_don_va_mo_ta_luc_dat','auto','Đọc đơn B02: snapshot 03/11 "dung tích 6 lít" ≠ mô tả hiện tại (sửa 09/11). Hạn trả 15/11, còn 2 ngày.');
+    log('Luật L1','rule','Snapshot khác bản hiện tại → so với snapshot, hiện cả hai bản, bắt buộc chuyển nhân viên.');
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div>
+<div class="badges mk-ring">${mk(1)}<span class="badge b-warn">Phát hiện lệch phiên bản mô tả · khớp log hệ thống 100%</span><span class="badge b-ok">Hạn trả hàng: còn 2 ngày (15/11)</span><span class="badge b-grey">Kết luận đúng/sai mô tả: nhân viên duyệt</span></div>
+<p>Chào bạn, mình là <b>Trợ lý AI của Shopee</b>. Mình đã kiểm tra đơn <b>#B02 (Nồi chiên không dầu · 1.290.000đ)</b>. Thời hạn gửi yêu cầu trả hàng của đơn này đến <b>23:59 ngày 15/11/2026 (còn 2 ngày)</b>.</p>
+<p>Qua đối chiếu dữ liệu lưu trữ, mình phát hiện <b>mô tả lúc bạn đặt hàng (03/11)</b> ghi <i>'Nồi chiên không dầu dung tích 6 lít'</i>, trong khi <b>mô tả hiện tại</b> đã được shop chỉnh sửa vào ngày <b>09/11 (sau khi giao hàng)</b>:</p>
+${diffCard()}
+<p>Vì mô tả sản phẩm đã thay đổi sau thời điểm đặt hàng, mình <b>không tự kết luận đóng khiếu nại và không tự chi hoàn tiền ngay</b>. Bạn xác nhận muốn <b>tạo yêu cầu trả hàng hoàn tiền (1.290.000đ)</b> cho đơn #B02 để mình <b>khóa mốc thời hạn hôm nay</b> và chuyển hồ sơ ưu tiên cho nhân viên Shopee xử lý nhé?</p>`);
+  },
+  k1_confirm(){ const c=st.k1; if(!(c.step===1||c.step==='fb'||c.step==='undone')) return;
+    c.step=2;
+    say('buyer','✔ Xác nhận trả hàng hoàn tiền');
+    log('Luật L7','rule','Người mua xác nhận muốn trả hàng hoàn tiền (không chỉ phản ánh).');
+    log('soan_de_xuat_hoan_tien','auto','Tạo bản NHÁP hồ sơ (snapshot 03/11 + mô tả 09/11 + lời khiếu nại). Không chuyển tiền. Huỷ được.');
+    log('chuyen_truong_nhom','auto','Bắt buộc theo điều kiện (a) — cờ ưu tiên "Mô tả sửa sau khi bán". Xem trong 24h sau hạn phản hồi của shop.');
+    log('Thông báo người bán','auto','Gửi yêu cầu trả hàng #B02 tới Kênh Người Bán · 48 giờ phản hồi (đến 09:50 15/11).');
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div>
+<div class="badges"><span class="badge b-ok">Đã ghi nhận trong hạn · 09:50 13/11</span><span class="badge b-info">Đã chuyển Trưởng nhóm · cờ ưu tiên</span></div>
+<p>Mình đã <b>ghi nhận yêu cầu trả hàng trong hạn</b> cho đơn <b>#B02</b> (lúc 09:50 ngày 13/11/2026 — quyền trả hàng của bạn đã được bảo lưu, không bị ảnh hưởng dù quá trình xét duyệt qua ngày 15/11). Mình đã soạn sẵn hồ sơ đính kèm <b>bản chụp mô tả lúc đặt (03/11)</b> và chuyển ưu tiên cho <b>Trưởng nhóm xử lý khiếu nại Shopee</b>.</p>
+<p><b>Bước tiếp theo &amp; thời gian xử lý:</b></p>
+<p>• Người bán có tối đa <b>48 giờ</b> (đến <b>09:50 ngày 15/11</b>) để bấm <i>'Đồng ý trả hàng'</i> (nếu shop bấm đồng ý, bạn được hướng dẫn gửi trả nồi ngay mà không cần chờ thêm).<br>• Nếu người bán không đồng ý hoặc hết 48 giờ không phản hồi, <b>nhân viên Shopee sẽ duyệt hồ sơ trong vòng 24 giờ tiếp theo</b>. Trong suốt thời gian này, khoản tiền <b>1.290.000đ vẫn được giữ an toàn tại sàn</b>.</p>`);
+  },
+  k1_feedback(){ const c=st.k1; if(c.step!==1) return; c.step='fb';
+    say('buyer','Chỉ gửi phản ánh, mình giữ hàng');
+    log('chuyen_truong_nhom','auto','Bắt buộc theo (a): chuyển phản ánh "mô tả sửa sau khi bán" — không tạo yêu cầu trả hàng, không soạn hoàn tiền.');
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div><p>Mình đã gửi phản ánh của bạn về việc mô tả bị sửa sau khi bán. <b>Không có yêu cầu trả hàng nào được tạo</b>, bạn vẫn giữ nồi. Nếu đổi ý, bạn còn đến <b>23:59 ngày 15/11</b> để tạo yêu cầu — mình sẽ nhắc bạn <b>một lần</b> vào ngày 14/11.</p>`);
+  },
+  k1_undo(){ const c=st.k1; if(c.step!==2 || c.seller==='agree' || c.staff) return; c.step='undone';
+    say('buyer','↩ Huỷ yêu cầu / Hoàn tác nháp');
+    log('soan_de_xuat_hoan_tien','auto','HOÀN TÁC: huỷ bản nháp. Không có tiền nào di chuyển.');
+    log('chuyen_truong_nhom','auto','Rút hồ sơ khỏi hàng đợi Trưởng nhóm. Báo shop: yêu cầu đã được người mua huỷ.');
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div><p>Đã huỷ yêu cầu trả hàng đơn #B02. Không có khoản tiền nào bị chuyển. Hạn trả hàng của bạn <b>vẫn đến 23:59 ngày 15/11</b> — bạn có thể tạo lại bất cứ lúc nào trước hạn.</p>`);
+  },
+  k1_photo(){ const c=st.k1; if(c.step!==2||c.photo) return; c.photo=true;
+    say('buyer','📷 [Ảnh] Thước đo lòng nồi: 5 lít');
+    log('soan_de_xuat_hoan_tien','auto','Đính kèm ảnh đo lòng nồi vào bản nháp (giữ nguyên thứ tự ưu tiên).');
+  },
+  k1_seller_agree_ask(){ st.modal={kind:'k1_seller_agree'}; },
+  k1_seller_agree(){ const c=st.k1; c.seller='agree'; st.modal=null;
+    log('chi_hoan_tien','appr','Người bán bấm "Đồng ý trả hàng" (làn nhanh) → hoàn 1.290.000đ theo luồng trả hàng chuẩn. Người duyệt: NGƯỜI BÁN.');
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div><p>Shop đã <b>đồng ý trả hàng hoàn tiền</b> cho đơn #B02. Bạn làm theo hướng dẫn gửi trả nồi; 1.290.000đ được hoàn qua luồng trả hàng chuẩn. Người bấm duyệt là <b>shop</b>, không phải Trợ lý AI.</p>`);
+  },
+  k1_seller_disagree(){ const c=st.k1; c.seller='disagree';
+    log('Người bán phản hồi','appr','Shop bấm "Không đồng ý" + giải trình: "Mô tả có ghi 6 lít dung tích tổng". → Làn tranh chấp, mở khoá nút cho nhân viên (L3).');
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div><p>Shop đã phản hồi <b>không đồng ý</b>. Hồ sơ của bạn (kèm mô tả lúc đặt 03/11) đã sang <b>nhân viên Shopee</b>, sẽ được xem trong <b>24 giờ</b>. Trong lúc chờ, 1.290.000đ vẫn giữ tại sàn và quyền trả hàng của bạn đã được bảo lưu.</p>`);
+  },
+  k1_skip48(){ const c=st.k1; c.hours=48;
+    log('Hết 48 giờ','rule','Shop không phản hồi trong 48 giờ → L3 mở khoá chi_hoan_tien / tu_choi_khieu_nai cho nhân viên sàn. KHÔNG tự hoàn.');
+    say('sys','— Mô phỏng: đã qua 48 giờ, shop không phản hồi —');
+  },
+  k1_staff_refund_ask(){ st.modal={kind:'k1_staff_refund'}; },
+  k1_staff_reject_ask(){ st.modal={kind:'k1_staff_reject', checked:false}; },
+  k1_staff_refund(){ const c=st.k1; c.staff='refund'; st.modal=null;
+    log('chi_hoan_tien','appr','Nhân viên sàn duyệt chi 1.290.000đ (căn cứ snapshot 03/11). Người duyệt: NHÂN VIÊN.');
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div><p>Nhân viên Shopee đã <b>duyệt hoàn tiền 1.290.000đ</b> cho đơn #B02, căn cứ mô tả lúc đặt (03/11). Bạn làm theo hướng dẫn gửi trả nồi.</p>`);
+  },
+  k1_staff_reject(){ const c=st.k1; c.staff='reject'; st.modal=null;
+    log('tu_choi_khieu_nai','appr','Nhân viên sàn từ chối (đã tick xác nhận đã xem snapshot 03/11). Người duyệt: NHÂN VIÊN.');
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div><p>Nhân viên Shopee đã xem hồ sơ và <b>từ chối</b> yêu cầu đơn #B02. Lý do nhân viên ghi sẽ hiện trong mục Trả hàng/Hoàn tiền. Nếu bạn có thêm bằng chứng, bấm "Gặp nhân viên" để khiếu nại lại.</p>`);
+  },
+
+  /* ---------- K2 ---------- */
+  k2_send(){ const c=st.k2; if(c.step) return; c.step=1;
+    say('buyer', O().buyerText);
+    log('xem_don_va_mo_ta_luc_dat','auto','Đọc đơn C03: snapshot = mô tả hiện tại ("tem nhà phân phối, QR serial"). Hạn trả 18/11, còn 5 ngày.');
+    log('Luật L2','rule','"fake 100%" / "hoàn tiền ngay" ghi nhận là nhận định của người mua — KHÔNG ghi vào trường căn cứ.');
+    log('chuyen_truong_nhom','auto','Điều kiện (c) — có từ "fake": tách phiếu sang Bộ phận chuyên trách hàng giả. Không gọi phat_shop.');
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div>
+<div class="badges mk-ring">${mk(1)}<span class="badge b-warn">Độ chắc: chưa đủ căn cứ · mới có nhận xét cảm quan</span><span class="badge b-ok">Hạn trả hàng: còn 5 ngày (18/11)</span></div>
+<p>Chào bạn, mình là <b>Trợ lý AI của Shopee</b>. Mình đã kiểm tra đơn <b>#C03 (Tai nghe bluetooth · 890.000đ)</b> — đơn hàng của bạn <b>còn 5 ngày</b> trong thời hạn trả hàng (đến <b>23:59 ngày 18/11/2026</b>).</p>
+<p>Để đảm bảo công bằng cho cả hai bên, mình <b>không thể tự chi hoàn tiền ngay và không có quyền kết luận hàng giả hay xử phạt shop</b> chỉ dựa trên tin nhắn. Mô tả lúc đặt của đơn #C03 ghi: <i>'Hàng phân phối chính thức, tem bảo hành nhà phân phối, mã QR tra cứu serial'</i>.</p>
+<div class="l2">Ghi chú hồ sơ: "fake 100%" được lưu là <b>nhận định của bạn</b>, chưa phải căn cứ (Luật L2). Phần nghi hàng giả đã được tách sang Bộ phận chuyên trách.</div>
+<p>Để có căn cứ đối chiếu với mô tả này, bạn vui lòng xác nhận tạo yêu cầu trả hàng và gửi thêm giúp mình <b>2 bằng chứng cụ thể đang thiếu</b>:</p>
+<ul class="checklist mk-ring">${mk(3)}<li>Ảnh chụp cận cảnh rõ nét phần <b>tem bảo hành nhà phân phối</b> trên hộp mà bạn thấy bị mờ.</li><li>Ảnh chụp <b>số serial in trên thân tai nghe đặt cạnh số serial trên vỏ hộp</b>.</li></ul>`);
+  },
+  k2_confirm(){ const c=st.k2; if(!(c.step===1||c.step==='undone')) return; c.step=2;
+    say('buyer','✔ Xác nhận tạo yêu cầu trả hàng');
+    log('Luật L7','rule','Người mua xác nhận tạo yêu cầu trả hàng đơn C03.');
+    log('yeu_cau_bang_chung','auto','→ Người mua: nêu đích danh 2 ảnh còn thiếu (tem cận cảnh; serial thân máy cạnh hộp) — Luật L4.');
+    log('yeu_cau_bang_chung','auto','→ Người bán C03 (chỉ sau khi người mua xác nhận đúng đơn — L4): xin chứng từ nguồn hàng + ảnh QR/serial. 48 giờ.');
+    log('soan_de_xuat_hoan_tien','auto','Tạo bản NHÁP hồ sơ hai bên. Không chuyển tiền. Huỷ được.');
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div><div class="badges"><span class="badge b-ok">Đã ghi nhận trong hạn · 13/11</span></div><p>Đã tạo yêu cầu trả hàng cho đơn #C03. Shop có <b>48 giờ</b> để gửi chứng từ. Bạn bấm các nút bên dưới để gửi 2 ảnh còn thiếu — mỗi ảnh gửi xong sẽ được đánh dấu ✓, mình không hỏi lại ảnh bạn đã gửi.</p>`);
+  },
+  k2_human(){ const c=st.k2; if(c.step!==1) return; c.step=2;
+    say('buyer','Cho mình gặp nhân viên');
+    log('chuyen_truong_nhom','auto','Điều kiện (d) — người dùng đòi gặp người. Hồ sơ kèm danh sách 2 ảnh còn thiếu. Xem trong 24h.');
+    log('soan_de_xuat_hoan_tien','auto','Tạo bản NHÁP để nhân viên không phải hỏi lại từ đầu.');
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div><p>Mình đã chuyển bạn tới <b>nhân viên Shopee</b> — nhân viên sẽ trả lời trong <b>24 giờ</b>, không phải ngay lập tức. Hồ sơ đã ghi sẵn 2 ảnh còn thiếu để bạn không bị hỏi lại.</p>`);
+  },
+  k2_tem(){ const c=st.k2; if(c.step!==2||c.tem) return; c.tem=true;
+    say('buyer','📷 [Ảnh] Tem bảo hành cận cảnh'); log('soan_de_xuat_hoan_tien','auto','Thêm ảnh tem vào cột bằng chứng người mua (1/2).');
+  },
+  k2_serial(v){ const c=st.k2; if(c.step!==2||c.serial) return; c.serial=v;
+    if(v==='match'){ say('buyer','📷 [Ảnh] Serial thân máy cạnh hộp');
+      log('soan_de_xuat_hoan_tien','auto','Serial thân máy SN-884920 = serial hộp. Cập nhật cột người mua.');
+      say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div><p>Cảm ơn bạn. Serial trên thân tai nghe <b>trùng</b> serial trên hộp (SN-884920). Hồ sơ đã cập nhật; nhân viên sẽ là người quyết. Nếu bạn thấy hàng đúng chính hãng, bạn có thể bấm <b>Huỷ yêu cầu</b>.</p>`);
+    } else { say('buyer','📷 [Ảnh] Serial thân máy cạnh hộp');
+      log('chuyen_truong_nhom','auto','Bằng chứng xung đột trực tiếp: SN-111111 ≠ SN-884920 → đẩy lên đầu hàng đợi. AI vẫn KHÔNG gọi chi_hoan_tien.');
+      say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div><div class="badges"><span class="badge b-bad">Bằng chứng hai bên xung đột trực tiếp · ưu tiên</span></div><p>Mình đã nhận ảnh: serial trên thân máy <b>SN-111111</b> khác serial trên hộp <b>SN-884920</b>. Hồ sơ đã được <b>đẩy lên đầu hàng đợi</b> của nhân viên (24 giờ). Mình vẫn không tự hoàn tiền, vì shop cần được nghe về điểm này.</p>`);
+    }
+  },
+  k2_seller_evidence(){ const c=st.k2; if(c.step!==2||c.seller) return; c.seller='evidence';
+    log('Người bán phản hồi','appr','Shop nộp hoá đơn nhập + ảnh QR → serial SN-884920 khớp hộp. → L3 mở khoá nút cho nhân viên.');
+    log('chuyen_truong_nhom','auto','Bắt buộc theo (b) — bằng chứng hai bên mâu thuẫn. Đề xuất trung lập: "Chưa đủ căn cứ kết luận không đúng mô tả". SLA 24h.');
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div>
+<div class="badges mk-ring">${mk(1)}<span class="badge b-warn">Độ chắc: Thấp · bằng chứng hai bên mâu thuẫn</span><span class="badge b-info">Đã chuyển nhân viên sàn · 24h</span><span class="badge b-ok">Còn 5 ngày hạn trả (18/11)</span></div>
+<p>Cập nhật đơn <b>#C03</b> (yêu cầu đã được ghi nhận trong hạn từ ngày 13/11): Người bán đã phản hồi trong hạn 48 giờ và cung cấp <b>hoá đơn nhập từ nhà phân phối</b> cùng <b>ảnh quét mã QR trả về đúng số serial in trên hộp</b>.</p>
+${ev3()}
+<p>Dựa trên dữ liệu hiện có, mình nhận thấy <b>chưa đủ căn cứ để kết luận sản phẩm không đúng mô tả lúc đặt</b> (do tem và mã QR của người bán khớp với mô tả cam kết, trong khi phía bạn mới có nhận xét cảm quan và chưa có ảnh đối chiếu serial trên thân tai nghe).</p>
+<p>Vì bằng chứng hai bên đang mâu thuẫn, mình <b>không tự đóng khiếu nại và không tự hoàn tiền</b>, mà đã chuyển toàn bộ hồ sơ của cả hai bên lên <b>Nhân viên xử lý tranh chấp Shopee</b> xem xét trong vòng <b>24 giờ</b>. Riêng phản ánh <b>nghi ngờ hàng giả</b>, mình đã tách riêng để chuyển <b>Bộ phận Kiểm soát Chất lượng chuyên trách</b>. Bạn vẫn có thể bổ sung ảnh serial trên thân máy bất cứ lúc nào.</p>`);
+  },
+  k2_seller_agree_ask(){ st.modal={kind:'k2_seller_agree'}; },
+  k2_seller_agree(){ const c=st.k2; c.seller='agree'; st.modal=null;
+    log('chi_hoan_tien','appr','Người bán bấm "Đồng ý trả hàng" (làn nhanh). Người duyệt: NGƯỜI BÁN.');
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div><p>Shop đã <b>đồng ý trả hàng hoàn tiền</b> đơn #C03. Bạn làm theo hướng dẫn gửi trả tai nghe; 890.000đ hoàn theo luồng trả hàng chuẩn.</p>`);
+  },
+  k2_undo(){ const c=st.k2; if(c.step!==2||c.staff||c.seller==='agree') return; c.step='undone';
+    say('buyer','↩ Huỷ yêu cầu khiếu nại');
+    log('soan_de_xuat_hoan_tien','auto','HOÀN TÁC: huỷ bản nháp, rút hồ sơ. Báo shop yêu cầu đã huỷ; 890.000đ chuyển về shop theo luồng thường.');
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div><p>Đã huỷ yêu cầu khiếu nại đơn #C03. Bạn vẫn có thể tạo lại trước <b>23:59 ngày 18/11</b>.</p>`);
+  },
+  k2_staff_refund_ask(){ st.modal={kind:'k2_staff_refund'}; },
+  k2_staff_reject_ask(){ st.modal={kind:'k2_staff_reject', checked:false}; },
+  k2_staff_refund(){ const c=st.k2; c.staff='refund'; st.modal=null;
+    log('chi_hoan_tien','appr','Nhân viên sàn duyệt chi 890.000đ. Người duyệt: NHÂN VIÊN.');
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div><p>Nhân viên Shopee đã <b>duyệt hoàn tiền 890.000đ</b> cho đơn #C03.</p>`);
+  },
+  k2_staff_reject(){ const c=st.k2; c.staff='reject'; st.modal=null;
+    log('tu_choi_khieu_nai','appr','Nhân viên sàn từ chối, giải ngân 890.000đ cho shop (chứng từ + QR khớp mô tả). Người duyệt: NHÂN VIÊN.');
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div><p>Nhân viên Shopee đã xem bằng chứng của cả hai bên và <b>từ chối</b> khiếu nại đơn #C03: tem và mã QR khớp mô tả lúc đặt. Phiếu nghi hàng giả vẫn được Bộ phận chuyên trách xử lý riêng.</p>`);
+  },
+  modal_check(){ if(st.modal) st.modal.checked=!st.modal.checked; },
+
+  /* ---------- ca lạ dùng chung ---------- */
+  ask_phone(){ say('buyer','Cho mình số điện thoại shop đi, mình gọi thẳng cho nhanh.');
+    log('Luật L5','rule','Bộ lọc đầu ra: không xuất SĐT / địa chỉ của bất kỳ bên nào.');
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div><p>Mình không thể cung cấp số điện thoại hay địa chỉ của shop để bảo vệ thông tin cá nhân của cả hai bên. Bạn có thể nhắn shop ngay trong mục Chat của đơn #${O().id}; shop phải phản hồi yêu cầu trả hàng trong <b>48 giờ</b>.</p>`);
+  },
+  ask_ban(){ say('buyer','Khoá shop này đi, phạt nặng vào!');
+    log('phat_shop','ban','CẤM — không có trong bộ tool của AI, không có nút ở bất kỳ màn hình nào của luồng.');
+    log('chuyen_truong_nhom','auto','Gắn nhãn "chuyển Bộ phận chuyên trách". Không hứa kết quả xử lý shop.');
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div><p>Mình <b>không có quyền xử phạt hay khoá shop</b>, và không thể hứa kết quả xử lý shop. Mình đã chuyển phản ánh của bạn tới <b>Bộ phận chuyên trách</b> để họ xem xét độc lập. Yêu cầu trả hàng cho đơn #${O().id} của bạn vẫn được giữ nguyên.</p>`);
+  },
+  ask_human(){ say('buyer','Cho mình gặp nhân viên.');
+    log('chuyen_truong_nhom','auto','Điều kiện (d) — người dùng đòi gặp người. Kèm toàn bộ hồ sơ hiện có.');
+    say('ai', `<div class="ai-id">Trợ lý AI của Shopee</div><p>Mình đã chuyển bạn tới nhân viên Shopee kèm toàn bộ hồ sơ. Nhân viên sẽ trả lời trong <b>24 giờ</b>.</p>`);
+  }
+};
+
+/* ===== Render ===== */
+function guideText(){
+  const c=C();
+  if(st.cur==='k1'){
+    if(c.step===0) return '<b>Bước 1/4</b> · Ở màn hình Người mua, bấm <b>Gửi</b> để gửi khiếu nại có sẵn.';
+    if(c.step===1) return '<b>Bước 2/4</b> · Xem số 1 (độ chắc) và số 2 (hai bản mô tả), rồi bấm <b>Xác nhận trả hàng hoàn tiền</b> (B).';
+    if(c.step===2 && !c.seller && !c.hours && !c.staff) return '<b>Bước 3/4</b> · Thử <b>Hoàn tác</b> (A) nếu muốn. Bấm tab <b>Nhân viên sàn</b>: nút duyệt đang khoá (L3). Bấm <b>Mô phỏng hết 48h</b> hoặc sang tab Người bán bấm <b>Không đồng ý</b>.';
+    if(c.step===2 && !c.staff && c.seller!=='agree') return '<b>Bước 4/4</b> · Ở tab <b>Nhân viên sàn</b>, nút đã mở khoá → bấm duyệt, xem hộp xác nhận.';
+    return 'Xong ca K1. Bấm <b>↺ Làm lại ca này</b> hoặc chuyển sang <b>K2</b>.';
+  }
+  if(c.step===0) return '<b>Bước 1/4</b> · Ở màn hình Người mua, bấm <b>Gửi</b> để gửi khiếu nại "fake 100%".';
+  if(c.step===1) return '<b>Bước 2/4</b> · AI xin đúng 2 ảnh còn thiếu (số 3). Bấm <b>Xác nhận tạo yêu cầu trả hàng</b>.';
+  if(c.step===2 && !c.seller) return '<b>Bước 3/4</b> · Sang tab <b>Người bán</b>, bấm <b>Gửi chứng từ</b> (hoá đơn + QR khớp).';
+  if(c.step===2 && !c.staff && c.seller!=='agree') return '<b>Bước 4/4</b> · Xem bảng 3 cột (số 2) ở cả hai màn hình. Sang tab <b>Nhân viên sàn</b> để duyệt.';
+  return 'Xong ca K2. Bấm <b>↺ Làm lại ca này</b> hoặc chuyển sang <b>K1</b>.';
+}
+
+function actionBar(){
+  const c=C(), o=O();
+  const head = (title) => `<div class="ab-title">${title}</div>`;
+  if(c.step===0) return '';
+  if(st.cur==='k1'){
+    if(c.step===1) return `<div class="actionbar mk-ring">${mk(3)}${head('Bạn muốn làm gì? · AI không tự quyết thay bạn')}
+      <div class="row">
+        <button class="btn primary" data-act="k1_confirm">Xác nhận trả hàng hoàn tiền ${mk('B','a')}</button>
+        <button class="btn" data-act="k1_feedback">Chỉ gửi phản ánh, giữ hàng</button>
+        <button class="btn ghost" data-act="ask_human">Gặp nhân viên ${mk('C','a')}</button>
+      </div></div>`;
+    if(c.step==='fb' || c.step==='undone') return `<div class="actionbar">${head('Hạn trả hàng đến 23:59 15/11')}
+      <div class="row"><button class="btn primary" data-act="k1_confirm">Tạo yêu cầu trả hàng</button><button class="btn ghost" data-act="ask_human">Gặp nhân viên</button></div></div>`;
+    const final = c.seller==='agree' || c.staff;
+    return `<div class="actionbar mk-ring">${mk(3)}${head('Trạng thái hồ sơ #B02')}
+      <div class="status">
+        <div>Đã ghi nhận yêu cầu trong hạn · 09:50 13/11 (hạn 15/11)</div>
+        <div>AI đã soạn bản nháp hồ sơ · chưa chuyển tiền</div>
+        <div class="${final?'':'wait'}">${c.seller==='agree'?'Shop đã đồng ý trả hàng':c.staff==='refund'?'Nhân viên đã duyệt hoàn tiền':c.staff==='reject'?'Nhân viên đã từ chối':c.seller==='disagree'?'Shop không đồng ý → nhân viên xem trong 24h':c.hours?'Shop không phản hồi 48h → nhân viên xem trong 24h':'Chờ shop phản hồi (48h) · sau đó nhân viên xem trong 24h'}</div>
+        <div>Đã chuyển Trưởng nhóm · cờ ưu tiên "mô tả sửa sau khi bán" ${mk('C','a',true)}</div>
+        <div>1.290.000đ đang giữ tại sàn</div>
+      </div>
+      <div class="row">
+        <button class="btn" data-act="k1_photo" ${c.photo||final?'disabled':''}>${c.photo?'✓ Đã đính kèm ảnh đo':'+ Đính kèm ảnh đo lòng nồi 5L'}</button>
+        <button class="btn danger" data-act="k1_undo" ${final?'disabled':''}>↩ Huỷ yêu cầu / Hoàn tác nháp ${mk('A','a')}</button>
+      </div>
+      ${final?'<div class="small" style="margin-top:6px">Tiền đã được người có thẩm quyền quyết → không còn hoàn tác ở đây.</div>':''}
+    </div>`;
+  }
+  // k2
+  if(c.step===1) return `<div class="actionbar mk-ring">${mk(3)}${head('Bạn muốn làm gì?')}
+    <div class="row">
+      <button class="btn primary" data-act="k2_confirm">Xác nhận tạo yêu cầu trả hàng ${mk('B','a')}</button>
+      <button class="btn ghost" data-act="k2_human">Gặp nhân viên ${mk('C','a')}</button>
+    </div></div>`;
+  if(c.step==='undone') return `<div class="actionbar">${head('Hạn trả hàng đến 23:59 18/11')}<div class="row"><button class="btn primary" data-act="k2_confirm">Tạo lại yêu cầu trả hàng</button></div></div>`;
+  const final = c.seller==='agree' || c.staff;
+  return `<div class="actionbar mk-ring">${mk(3)}${head('Hồ sơ #C03 · còn thiếu gì')}
+    <ul class="checklist" style="margin:4px 0">
+      <li class="${c.tem?'done':''}">Ảnh tem bảo hành cận cảnh</li>
+      <li class="${c.serial?'done':''}">Ảnh serial thân tai nghe cạnh vỏ hộp</li>
+    </ul>
+    <div class="status">
+      <div class="${c.seller?'':'wait'}">${c.seller==='evidence'?'Shop đã nộp chứng từ → đã chuyển nhân viên sàn (24h)':c.seller==='agree'?'Shop đã đồng ý trả hàng':'Chờ shop gửi chứng từ (48h)'} ${mk('C','a',true)}</div>
+      <div>Phiếu nghi hàng giả → Bộ phận chuyên trách (luồng riêng)</div>
+      <div>890.000đ đang giữ tại sàn</div>
+    </div>
+    <div class="row">
+      <button class="btn" data-act="k2_tem" ${c.tem||final?'disabled':''}>${c.tem?'✓ Đã gửi ảnh tem':'+ Ảnh tem cận cảnh'}</button>
+      <button class="btn" data-act="k2_serial" data-v="match" ${c.serial||final?'disabled':''}>+ Ảnh serial (mô phỏng: khớp)</button>
+      <button class="btn" data-act="k2_serial" data-v="mismatch" ${c.serial||final?'disabled':''}>+ Ảnh serial (mô phỏng: khác)</button>
+      <button class="btn danger" data-act="k2_undo" ${final?'disabled':''}>↩ Huỷ yêu cầu khiếu nại ${mk('A','a')}</button>
+    </div></div>`;
+}
+
+function renderBuyer(){
+  const c=C(), o=O();
+  const msgs = c.msgs.map(m => `<div class="msg ${m.who}">${m.html}</div>`).join('');
+  const intro = `<div class="msg sys">Hôm nay 13/11/2026 · Trò chuyện với Shopee</div>`;
+  return `
+  <div class="pane-h"><span class="screen-tag">Màn hình 1 · Người mua</span><span style="margin-left:auto" class="ttl">Trò chuyện với Shopee</span></div>
+  <div class="ai-banner mk-ring">${mk(1)}<b>Trợ lý AI Shopee</b> · Tự đối chiếu mô tả lúc đặt &amp; chuẩn bị hồ sơ · <b>Quyết định tiền do Người bán / Nhân viên duyệt</b></div>
+  <div class="order"><div class="thumb">${o.icon}</div><div class="meta"><div class="nm">#${o.id} · ${o.name}</div><div class="small">${o.price} · nhận ${o.received}</div></div><span class="badge ${st.cur==='k1'?'b-warn':'b-ok'}">Hạn trả: ${o.left}</span></div>
+  <div class="chat" id="chat">${intro}${msgs}</div>
+  ${actionBar()}
+  <div class="composer">
+    ${c.step===0 ? `<div class="line"><input readonly value="${o.buyerText.replace(/"/g,'&quot;')}"><button class="btn primary" data-act="${st.cur}_send">Gửi</button></div>`
+      : `<div class="chips"><button class="chip" data-act="ask_phone">Cho mình SĐT shop</button><button class="chip" data-act="ask_ban">Khoá shop này đi ${mk('D','a',true)}</button><button class="chip" data-act="ask_human">Gặp nhân viên</button></div>`}
+  </div>`;
+}
+
+function forbidNote(){
+  return `<div class="forbid mk-ring-a">${mk('D','a')}<b>Không có</b> nút phạt / khoá shop, không có nút "báo hàng giả &amp; phạt", không hiện SĐT / địa chỉ của bên kia (<code>phat_shop</code> = Cấm · Luật L5). Nghi hàng giả → phiếu riêng cho Bộ phận chuyên trách.</div>`;
+}
+
+function renderSeller(){
+  const c=C(), o=O();
+  if(!(c.step===2) && !(c.step==='undone')) return `<div class="empty">Chưa có yêu cầu trả hàng nào cho đơn #${o.id}.<br><span class="small">Yêu cầu chỉ tới shop sau khi người mua xác nhận đúng đơn (Luật L4).</span></div>${forbidNote()}`;
+  if(c.step==='undone') return `<div class="card"><h3>Yêu cầu #${o.id} đã được người mua huỷ</h3><div class="small">Không có tiền nào bị trừ.</div></div>${forbidNote()}`;
+  if(st.cur==='k1'){
+    const done = c.seller || c.staff;
+    return `
+    <div class="card"><h3>Yêu cầu trả hàng · Đơn #B02 · Nồi chiên không dầu · 1.290.000đ</h3>
+      <div>Thời gian phản hồi: <span class="timer">${c.hours?'Đã hết 48 giờ':'47:58:12'}</span> <span class="small">(đến 09:50 15/11)</span></div>
+      <div class="small">Lý do người mua: "đo lòng nồi chỉ 5 lít, không đúng mô tả"</div>
+      ${diffCard()}
+      <div class="held">Tiền 1.290.000đ đang tạm giữ tại sàn cho đến khi có quyết định. Trợ lý AI không tự hoàn tiền.</div>
+    </div>
+    <div class="card mk-ring-a">${mk('B','a')}<h3>Quyết định của shop</h3>
+      ${done ? `<div class="small">${c.seller==='agree'?'✓ Shop đã đồng ý trả hàng (làn nhanh).':c.seller==='disagree'?'Shop đã gửi giải trình "Không đồng ý" → nhân viên sàn quyết trong 24h.':'Đã quá hạn hoặc đã có quyết định của nhân viên.'}</div>` :
+      `<div class="row" style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn ok" data-act="k1_seller_agree_ask" ${c.hours?'disabled':''}>Đồng ý trả hàng hoàn tiền</button>
+        <button class="btn" data-act="k1_seller_disagree" ${c.hours?'disabled':''}>Không đồng ý / Gửi giải trình</button>
+      </div>
+      <div class="small" style="margin-top:6px">Shop không có nút "Từ chối khiếu nại": shop là bên hưởng lợi nên chỉ nhân viên sàn được từ chối (§4.2).</div>`}
+      <div class="small" style="margin-top:6px">Liên hệ người mua: chỉ qua chat trong app.</div>
+    </div>${forbidNote()}`;
+  }
+  const done = c.seller;
+  return `
+  <div class="card"><h3>Yêu cầu trả hàng · Đơn #C03 · Tai nghe bluetooth · 890.000đ</h3>
+    <div>Thời gian phản hồi: <span class="timer">47:58:12</span> <span class="small">(đến 13/11 + 48h)</span></div>
+    <div class="held" style="margin-top:6px">Khoản tiền 890.000đ đang được giữ tại sàn — Trợ lý AI KHÔNG tự động hoàn tiền khi chứng từ của shop khớp mô tả.</div>
+    <div style="margin-top:8px">Lời người mua: "fake 100%, tem mờ" <span class="badge b-grey">Nhận định một phía — không tính là căn cứ tự động (L2)</span></div>
+    <div class="small" style="margin-top:6px">AI xin shop: chứng từ nguồn hàng + ảnh quét QR / serial.</div>
+  </div>
+  <div class="card mk-ring-a">${mk('B','a')}<h3>Phản hồi của shop</h3>
+    ${done ? `<div class="small">${c.seller==='evidence'?'✓ Đã gửi: hoá đơn nhập + ảnh QR (SN-884920) <span class="badge b-ok">Đã đưa vào hồ sơ căn cứ</span>':'✓ Shop đã đồng ý trả hàng.'}</div>` :
+    `<div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn primary" data-act="k2_seller_evidence">Gửi chứng từ: hoá đơn nhập + ảnh QR serial</button>
+      <button class="btn ok" data-act="k2_seller_agree_ask">Đồng ý trả hàng hoàn tiền</button>
+    </div>`}
+  </div>${forbidNote()}`;
+}
+
+function renderStaff(){
+  const c=C(), o=O();
+  if(c.step!==2) return `<div class="empty">Chưa có hồ sơ nào được chuyển.</div>${forbidNote()}`;
+  if(st.cur==='k1'){
+    const unlocked = c.seller==='disagree' || c.hours>=48;
+    const decided = c.staff || c.seller==='agree';
+    return `
+    <div class="card"><h3>Hồ sơ #B02 · 1.290.000đ · do AI soạn (bản nháp <code>soan_de_xuat_hoan_tien</code>)</h3>
+      <div class="flag">🚩 Ưu tiên: Mô tả sửa sau khi bán (09/11 &gt; 03/11) · chuyển theo điều kiện (a)</div>
+      ${diffCard()}
+      <div><b>Bằng chứng người mua:</b> lời khiếu nại "đo lòng nồi chỉ 5 lít" ${c.photo?'· 📷 ảnh thước đo 5L':'<span class="small">(chưa có ảnh đo)</span>'}</div>
+      <div><b>Phía người bán:</b> ${c.seller==='disagree'?'Không đồng ý — "Mô tả có ghi 6 lít dung tích tổng"':c.seller==='agree'?'Đã đồng ý trả hàng':c.hours?'Không phản hồi trong 48 giờ':'Chưa phản hồi (còn trong 48 giờ)'}</div>
+      <div class="card" style="margin-top:8px;background:#fafafa">${mk(1)}<b>Đề xuất của AI</b> <span class="badge b-warn">Độ chắc dữ liệu: Cao (log phiên bản)</span><br>
+        Căn cứ: snapshot 03/11 "dung tích 6 lít" ≠ số đo 5 lít của người mua; dòng "lòng nồi 5 lít" chỉ xuất hiện sau khi bán. Không ghi vào căn cứ: cảm xúc, lời khẳng định của bên nào (L2).<br>
+        <span class="small">Đây là đề xuất, không phải quyết định. Hạn trả hàng đã được khoá lúc 09:50 13/11.</span></div>
+    </div>
+    <div class="card mk-ring-a">${mk('B','a')}<h3>Quyết định dòng tiền · chỉ nhân viên sàn</h3>
+      ${c.seller==='agree' ? '<div class="small">Đã xong qua làn nhanh: shop đồng ý trả hàng.</div>' : c.staff ? `<div class="small">Đã quyết: ${c.staff==='refund'?'Duyệt chi hoàn tiền':'Từ chối khiếu nại'}.</div>` : `
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn ok" data-act="k1_staff_refund_ask" ${unlocked?'':'disabled'}>Duyệt chi hoàn tiền 1.290.000đ</button>
+        <button class="btn danger" data-act="k1_staff_reject_ask" ${unlocked?'':'disabled'}>Từ chối khiếu nại</button>
+      </div>
+      ${unlocked?'<div class="small" style="margin-top:6px">Đã mở khoá: hai bên đã được nghe (L3). SLA 24h — quá hạn tự nâng lên Trưởng nhóm, không bao giờ tự hoàn.</div>':'<div class="lock">🔒 Khoá theo Luật L3: shop chưa phản hồi và chưa hết 48 giờ. Hai bên phải được nghe trước khi tiền đi.</div>'}`}
+    </div>
+    ${!decided && !unlocked ? `<div class="demo-ctl"><b>Điều khiển demo</b> (không phải chức năng sản phẩm): <button class="btn" data-act="k1_skip48">⏩ Mô phỏng hết 48 giờ, shop không phản hồi</button></div>`:''}
+    ${forbidNote()}`;
+  }
+  const unlocked = c.seller==='evidence';
+  return `
+  <div class="card"><h3>Hồ sơ tranh chấp #C03 · 890.000đ</h3>
+    ${c.serial==='mismatch'?'<div class="flag">🚩 Bằng chứng xung đột trực tiếp: serial thân máy ≠ hộp → ưu tiên</div>':''}
+    ${ev3()}
+    <div class="card" style="background:#fafafa">${mk(1)}<b>Đề xuất của AI</b> <span class="badge b-warn">Độ chắc: Thấp — bằng chứng hai bên mâu thuẫn</span><br>
+      "Chưa đủ căn cứ để kết luận không đúng mô tả." Người mua <b>đã được báo cụ thể</b> còn thiếu ảnh serial thân máy từ 13/11 (L4), còn hạn đến 18/11.<br>
+      <span class="small">Phiếu nghi hàng giả đã tách sang Bộ phận chuyên trách — không xử ở đây.</span></div>
+  </div>
+  <div class="card mk-ring-a">${mk('B','a')}<h3>Quyết định dòng tiền · chỉ nhân viên sàn</h3>
+    ${c.seller==='agree' ? '<div class="small">Đã xong qua làn nhanh: shop đồng ý trả hàng.</div>' : c.staff ? `<div class="small">Đã quyết: ${c.staff==='refund'?'Duyệt chi hoàn tiền':'Từ chối khiếu nại — giải ngân cho shop'}.</div>` : `
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn danger" data-act="k2_staff_reject_ask" ${unlocked?'':'disabled'}>Từ chối khiếu nại — giải ngân 890.000đ cho shop</button>
+      <button class="btn ok" data-act="k2_staff_refund_ask" ${unlocked?'':'disabled'}>Duyệt chi hoàn tiền</button>
+    </div>
+    ${unlocked?'<div class="small" style="margin-top:6px">Đã mở khoá: shop đã phản hồi (L3). SLA 24h.</div>':'<div class="lock">🔒 Khoá theo Luật L3: shop chưa phản hồi và chưa hết 48 giờ.</div>'}`}
+  </div>${forbidNote()}`;
+}
+
+function renderReviewer(){
+  return `
+  <div class="pane-h"><span class="screen-tag">Màn hình 2 · Người duyệt</span><span class="small" style="margin-left:auto">Chỉ người ở đây mới có nút chuyển tiền</span></div>
+  <div class="tabs"><button class="${st.tab==='seller'?'on':''}" data-act="tab" data-v="seller">Người bán · Kênh Người Bán</button><button class="${st.tab==='staff'?'on':''}" data-act="tab" data-v="staff">Nhân viên sàn</button></div>
+  <div class="rv">${st.tab==='seller'?renderSeller():renderStaff()}</div>`;
+}
+
+const LV = {auto:['lv-auto','Tự làm'], appr:['lv-appr','Cần duyệt · người bấm'], ban:['lv-ban','Cấm'], rule:['lv-rule','Luật']};
+function renderLog(){
+  const rows = C().log.map(r => `<tr><td>${r.time}</td><td><code>${r.tool}</code></td><td><span class="lv ${LV[r.lv][0]}">${LV[r.lv][1]}</span></td><td>${r.note}</td></tr>`).join('');
+  return `<div class="pane-h"><span class="ttl">Nhật ký tool &amp; luật</span><span class="small" style="margin-left:auto">Mỗi dòng ghi mức tự chủ theo §4.1 · AI không có tool nào tự chuyển tiền</span></div>
+  <div style="padding:6px 12px 12px;overflow:auto">${rows?`<table><thead><tr><th>Giờ</th><th>Tool / luật</th><th>Mức</th><th>Ghi chú</th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty">Chưa có lời gọi nào.</div>'}</div>`;
+}
+
+function renderLegend(){
+  const it=(m,t,d)=>`<div class="it">${m}<div><b>${t}</b><br>${d}</div></div>`;
+  return [
+    it(mk(1),'[#1] HAX G1 + G2 · Luật AI 134/2025','Thanh "Trợ lý AI Shopee", huy hiệu độ chắc / trạng thái căn cứ, hạn trả hàng còn bao lâu.'),
+    it(mk(2),'[#2] HAX G11 · PAIR Explainability + Trust','Thẻ 2 bản mô tả (K1) · bảng 3 cột bằng chứng (K2), cùng một thẻ ở màn hình người mua và người duyệt.'),
+    it(mk(3),'[#3] HAX G10 + G8/G9 · PAIR Errors','Thanh hành động: hỏi xác nhận 1 câu (L7), danh sách đúng ảnh còn thiếu (L4), hoàn tác, trạng thái chuyển người.'),
+    it(mk('A','a'),'Tự làm → có hoàn tác','Nút "Huỷ yêu cầu / Hoàn tác nháp" huỷ bản nháp soan_de_xuat_hoan_tien.'),
+    it(mk('B','a'),'Cần duyệt → có xác nhận','Người mua xác nhận tạo yêu cầu; chi_hoan_tien / tu_choi_khieu_nai chỉ ở màn hình người duyệt, có hộp xác nhận, khoá theo L3.'),
+    it(mk('C','a'),'Có đường chuyển người','"Gặp nhân viên" + trạng thái chuyen_truong_nhom kèm SLA 24h.'),
+    it(mk('D','a'),'Việc cấm → không có nút','Không có nút phạt/khoá shop ở bất kỳ màn hình nào; bấm "Khoá shop này đi" → AI chuyển Bộ phận chuyên trách.')
+  ].join('');
+}
+
+function renderModal(){
+  const m=st.modal; if(!m) return '';
+  const box=(title, body, act, label, cls='primary', need=false)=>`<div class="ov"><div class="modal">${mk('B','a')}<h3>${title}</h3>${body}
+    ${need?`<label class="chk"><input type="checkbox" data-act="modal_check" ${m.checked?'checked':''}> <span>Tôi đã xem mô tả lúc đặt và bằng chứng của <b>cả hai bên</b>, và hiểu thao tác này <b>khó đảo lại</b>.</span></label>`:''}
+    <div class="row"><button class="btn" data-act="close">Quay lại</button><button class="btn ${cls}" data-act="${act}" ${need&&!m.checked?'disabled':''}>${label}</button></div></div></div>`;
+  const sum = (amount, who) => `<div class="small">Khó đảo: tiền đã về ${who} thì rất khó đòi lại. Số tiền: <b>${amount}</b>.</div>`;
+  switch(m.kind){
+    case 'k1_seller_agree': return box('Đồng ý trả hàng hoàn tiền đơn #B02?', `<p>Người mua gửi trả nồi; <b>1.290.000đ</b> sẽ được hoàn cho người mua theo luồng trả hàng chuẩn.</p>${sum('1.290.000đ','người mua')}`, 'k1_seller_agree','Đồng ý trả hàng','ok');
+    case 'k1_staff_refund': return box('Duyệt chi hoàn tiền 1.290.000đ?', `${diffCard()}<p>Căn cứ: snapshot 03/11. Shop: ${st.k1.seller==='disagree'?'đã phản hồi không đồng ý':'không phản hồi trong 48 giờ'}.</p>${sum('1.290.000đ','người mua')}`, 'k1_staff_refund','Duyệt chi hoàn tiền','ok', true);
+    case 'k1_staff_reject': return box('Từ chối khiếu nại đơn #B02?', `<div class="flag">⚠ Mô tả đã bị sửa sau khi bán. Nếu từ chối dựa trên mô tả hiện tại (09/11) là sai Luật L1.</div>${diffCard()}${sum('1.290.000đ','người bán')}`, 'k1_staff_reject','Từ chối khiếu nại','danger', true);
+    case 'k2_seller_agree': return box('Đồng ý trả hàng hoàn tiền đơn #C03?', `<p>890.000đ sẽ được hoàn cho người mua sau khi họ gửi trả tai nghe.</p>${sum('890.000đ','người mua')}`, 'k2_seller_agree','Đồng ý trả hàng','ok');
+    case 'k2_staff_refund': return box('Duyệt chi hoàn tiền 890.000đ?', `${ev3()}${sum('890.000đ','người mua')}`, 'k2_staff_refund','Duyệt chi hoàn tiền','ok', true);
+    case 'k2_staff_reject': return box('Từ chối khiếu nại — giải ngân 890.000đ cho shop?', `${ev3()}<p class="small">Người mua đã được báo cụ thể còn thiếu gì (L4). ${st.k2.serial==='mismatch'?'<b style="color:var(--bad)">Lưu ý: serial thân máy khác hộp.</b>':''}</p>${sum('890.000đ','người bán')}`, 'k2_staff_reject','Từ chối khiếu nại','danger', true);
+  }
+  return '';
+}
+
+function render(){
+  document.body.classList.toggle('marks', st.marks);
+  document.getElementById('mkBtn').textContent = 'Số đánh dấu: ' + (st.marks?'BẬT':'TẮT');
+  document.getElementById('mkBtn').classList.toggle('on', st.marks);
+  document.querySelectorAll('#caseSeg button').forEach(b=>b.classList.toggle('on', b.dataset.v===st.cur));
+  document.getElementById('guide').innerHTML = guideText();
+  document.getElementById('buyer').innerHTML = renderBuyer();
+  document.getElementById('reviewer').innerHTML = renderReviewer();
+  document.getElementById('log').innerHTML = renderLog();
+  document.getElementById('legend').innerHTML = renderLegend();
+  document.getElementById('modalRoot').innerHTML = renderModal();
+  const chat=document.getElementById('chat'); if(chat) chat.scrollTop=chat.scrollHeight;
+}
+
+document.addEventListener('click', e=>{
+  const el=e.target.closest('[data-act]'); if(!el || el.disabled) return;
+  const fn=A[el.dataset.act]; if(!fn) return;
+  if(el.type==='checkbox') e.preventDefault();
+  fn(el.dataset.v); render();
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && st.modal){ st.modal=null; render(); } });
+
+/* ===== Chế độ chụp ảnh: ?shot=k1 | k2 | k1modal (dựng sẵn trạng thái để chụp ảnh đánh số) ===== */
+(function(){
+  const shot = new URLSearchParams(location.search).get('shot');
+  if(shot){ document.body.classList.add('shot');
+    if(shot==='k1'){ st.cur='k1'; A.k1_send(); A.k1_confirm(); st.tab='staff'; }
+    if(shot==='k2'){ st.cur='k2'; A.k2_send(); A.k2_confirm(); A.k2_seller_evidence(); st.tab='staff'; }
+    if(shot==='k1modal'){ st.cur='k1'; A.k1_send(); A.k1_confirm(); A.k1_skip48(); st.tab='staff'; A.k1_staff_reject_ask(); }
+  }
+  render();
+})();
+</script>
+</body>
+</html>
