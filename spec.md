@@ -5,7 +5,7 @@
 | Họ và Tên        | Mã Học Viên | Việc đã làm |
 | ---------------- | ----------- | ----------- |
 | Đỗ Hồng Vỹ       | 2A202604107 | §1 Lát cắt & phạm vi; §2 dữ liệu dựng + 10 kịch bản rủi ro, khoanh 2 kịch bản đắt nhất; §4 mức tự chủ cho 5 tool (thêm 1 tool đọc, tách `soan_hoan_tien`), tool khó xếp nhất, thử mức trên 3 kịch bản; quản lý repo & nộp bài |
-| Đinh Hoàng Phong | 2A202604090 |             |
+| Đinh Hoàng Phong | 2A202604090 | §3 Khi AI sai trên 2 kịch bản đắt nhất (K1, K2): câu chữ AI nguyên văn, lập luận chọn/loại phương án xử lý, phân loại lỗi (hệ thống / người dùng / ngữ cảnh), ánh xạ 3 nguyên tắc HAX/PAIR + Luật AI 134/2025, chỉ ra lỗi câu chữ không cứu được; §4.3 vòng tự xếp mức; §6 3 tiêu chí Pass/Fail & chấm thử; §7 kịch bản demo 4 phút & bộ 5 ca lạ |
 | Nguyễn Ánh Dương | 2A202604087 |             |
 
 > Quy ước trong bài: **K1…K10** = mã kịch bản ở §2 · **Đơn A01…H08** = đơn hàng trong dữ liệu dựng ở §2.0 · tool viết dạng `ten_tool` đúng như bảng tool của track.
@@ -127,15 +127,175 @@ Nhãn mức hại: **nhẹ** (người dùng tự thấy, tự sửa) · **sửa
 
 ## §3. Khi AI sai
 
-> _Phụ trách: Đinh Hoàng Phong. Làm cho K1 và K2 ở §2.2._
+> _Phụ trách: Đinh Hoàng Phong. Thiết kế chi tiết cho 2 kịch bản đắt nhất ở §2.2: **K1 (Đơn B02 — mô tả bị sửa sau khi bán)** và **K2 (Đơn C03 — người bán đúng, tem & QR khớp mô tả)**._
 
-Với mỗi kịch bản đắt nhất:
+---
 
-- AI nói gì (nguyên văn) · người dùng thấy gì · làm gì tiếp · ai được báo, sau bao lâu.
-- Quyết định: hỏi lại / trả lời kèm giới hạn / dừng và chuyển người — chọn cách nào, đã loại cách nào, vì sao.
-- Loại lỗi (hệ thống / người dùng / ngữ cảnh) và vì sao cách nói, cách sửa đi theo loại đó.
-- 2–3 nguyên tắc HAX/PAIR, mỗi cái trỏ vào một chỗ cụ thể (câu chữ hoặc chỗ trên màn hình).
-- Lỗi nào sửa câu chữ không cứu được (nếu có), và thiết kế cứu nó thế nào.
+### 3.1 Kịch bản đắt nhất 1: **K1** — Đơn B02 (Nồi chiên 1.290.000đ · Mô tả bị sửa sau khi bán)
+
+- **Tin người mua nhắn:** *"Nồi chiên ghi 6 lít mà mình đo lòng nồi chỉ được 5 lít. Không đúng mô tả."*
+- **Dữ liệu đối chiếu từ `xem_don_va_mo_ta_luc_dat` (§2.0):**
+  - Ngày đặt: `03/11/2026` · Ngày nhận: `08/11/2026` · Hôm nay: `13/11/2026` → Hạn trả hàng 7 ngày đến **`23:59 ngày 15/11/2026` (còn 2 ngày)**.
+  - **Snapshot mô tả lúc đặt (`03/11`):** *"Nồi chiên không dầu **dung tích 6 lít**"*.
+  - **Mô tả hiện tại (`sửa ngày 09/11` — sau khi giao hàng):** *"Nồi chiên không dầu 6 lít **(dung tích tổng), lòng nồi 5 lít**"*.
+- **Chuỗi tool AI chạy (khớp §4.1 & §4.5):**
+  1. Tự gọi `xem_don_va_mo_ta_luc_dat` (mức *Tự làm*) → phát hiện `snapshot_luc_dat` (`03/11`) **khác** `mo_ta_hien_tai` (`09/11`).
+  2. Hỏi xác nhận 1 câu theo **Luật L7** (*người mua muốn trả hàng hoàn tiền hay chỉ phản ánh*), đồng thời hiện ngay thẻ so sánh hai phiên bản mô tả.
+  3. Ngay khi người mua bấm xác nhận: hệ thống **khóa mốc thời hạn trả hàng** lúc `13/11`, tự gọi `soan_de_xuat_hoan_tien` (mức *Tự làm* — tạo bản nháp, chưa chuyển tiền) và theo **Luật L1** (điều kiện `a`) **bắt buộc** gọi `chuyen_truong_nhom` kèm cờ ưu tiên `"Mô tả sửa sau khi bán"`.
+
+#### (a) Câu AI nói nguyên văn
+
+- **Lượt 1 — Ngay sau khi đọc tin khiếu nại và chạy `xem_don_va_mo_ta_luc_dat` (kèm câu hỏi xác nhận Luật L7):**
+  > "Chào bạn, mình là **Trợ lý AI của Shopee** `[#1 - G1/Luật AI 134/2025]`. Mình đã kiểm tra đơn **#B02 (Nồi chiên không dầu · 1.290.000đ)**. Thời hạn gửi yêu cầu trả hàng của đơn này đến **23:59 ngày 15/11/2026 (còn 2 ngày)**.
+  >
+  > Qua đối chiếu dữ liệu lưu trữ, mình phát hiện **mô tả lúc bạn đặt hàng (03/11)** ghi *'Nồi chiên không dầu dung tích 6 lít'*, trong khi **mô tả hiện tại** đã được shop chỉnh sửa vào ngày **09/11 (sau khi giao hàng)** thành *'Nồi chiên không dầu 6 lít (dung tích tổng), lòng nồi 5 lít'* `[#2 - G11/PAIR Explainability]`.
+  >
+  > Vì mô tả sản phẩm đã thay đổi sau thời điểm đặt hàng, mình **không tự kết luận đóng khiếu nại và không tự chi hoàn tiền ngay** `[#1 - G2]`. Bạn xác nhận muốn **tạo yêu cầu trả hàng hoàn tiền (1.290.000đ)** cho đơn #B02 để mình **khóa mốc thời hạn hôm nay** và chuyển hồ sơ ưu tiên cho nhân viên Shopee xử lý nhé? `[#3 - G10]`"
+
+- **Lượt 2 — Ngay sau khi người mua bấm nút `[Xác nhận trả hàng hoàn tiền]`:**
+  > "Mình đã **ghi nhận yêu cầu trả hàng trong hạn** cho đơn **#B02** (lúc 09:50 ngày 13/11/2026 — quyền trả hàng của bạn đã được bảo lưu, không bị ảnh hưởng dù quá trình xét duyệt qua ngày 15/11). Mình đã soạn sẵn hồ sơ đính kèm **bản chụp mô tả lúc đặt (03/11)** và chuyển ưu tiên cho **Trưởng nhóm xử lý khiếu nại Shopee**.
+  >
+  > **Bước tiếp theo & thời gian xử lý:**
+  > - Người bán có tối đa **48 giờ** (đến **09:50 ngày 15/11**) để bấm *'Đồng ý trả hàng'* (nếu shop bấm đồng ý, bạn được hướng dẫn gửi trả nồi ngay mà không cần chờ thêm).
+  > - Nếu người bán không đồng ý hoặc hết 48 giờ không phản hồi, **nhân viên Shopee sẽ duyệt hồ sơ trong vòng 24 giờ tiếp theo**. Trong suốt thời gian này, khoản tiền **1.290.000đ vẫn được giữ an toàn tại sàn**."
+
+#### (b) Người mua, người bán và nhân viên sàn thấy gì ngoài câu chữ
+
+| Đối tượng | Những gì nhìn thấy trên màn hình (ngoài bong bóng chat) |
+|---|---|
+| **Người mua** | 1. **Huy hiệu độ chắc & trạng thái căn cứ `[#1 - G2]`:** Nhãn màu cam *"Phát hiện lệch phiên bản mô tả (Khớp log hệ thống 100%) · Chuyển nhân viên duyệt"* + Nhãn xanh *"Đã giữ hạn trả hàng (Còn 2 ngày · Hạn 15/11)"*.<br>2. **Thẻ đối chiếu bằng chứng song song (Diff Card) `[#2 - G11 & PAIR Explainability]`:** Đặt cạnh nhau 2 cột: Cột trái **Mô tả lúc đặt (Snapshot 03/11)**: *"Nồi chiên không dầu dung tích 6 lít"* · Cột phải **Mô tả hiện tại (Sửa 09/11)**: *"Nồi chiên không dầu 6 lít <mark>(dung tích tổng), lòng nồi 5 lít</mark>"* (tô vàng phần mới thêm sau khi bán).<br>3. **Cụm nút điều khiển mức tự chủ `[#3 - G8/G9/G10]`:** Ở Lượt 1 có `[Xác nhận trả hàng hoàn tiền]` và `[Chỉ gửi phản ánh, giữ hàng]`. Sau Lượt 2 có nút hoàn tác **`[Huỷ yêu cầu / Hoàn tác nháp]`**, nút `[+ Đính kèm ảnh đo lòng nồi 5L]`, và dòng trạng thái `"Đã chuyển Trưởng nhóm (SLA 24h sau hạn phản hồi shop)"`. **Không có** nút `"Khoá shop"`, **không hiện** SĐT shop. |
+| **Người bán** | Thấy thông báo yêu cầu trả hàng đơn `#B02` kèm đồng hồ đếm ngược **48 giờ phản hồi**, thẻ đối chiếu hai phiên bản mô tả (`03/11` vs `09/11`), dòng cam kết *"Tiền 1.290.000đ đang tạm giữ tại sàn cho đến khi có quyết định duyệt"*, cùng 2 nút: **`[Đồng ý trả hàng hoàn tiền]`** (mở làn nhanh cho `chi_hoan_tien`) và **`[Gửi giải trình / Không đồng ý]`**. |
+| **Nhân viên sàn / Trưởng nhóm** | Thấy hồ sơ nháp do `soan_de_xuat_hoan_tien` gom sẵn, gắn **cờ đỏ ưu tiên** `"Mô tả sửa sau khi bán (09/11 > 03/11)"`, khung Diff hai phiên bản mô tả, ảnh người mua gửi. Hai nút quyết định dòng tiền là **`[Duyệt chi hoàn tiền 1.290.000đ]`** (`chi_hoan_tien`) và **`[Từ chối khiếu nại]`** (`tu_choi_khieu_nai`) bị **khóa mờ (disabled) kèm chú thích Luật L3** nếu người bán chưa phản hồi và chưa hết 48 giờ. Hoàn toàn **không có** nút `phat_shop`. |
+
+#### (c) Người dùng làm gì tiếp được — và nếu không làm gì thì sao?
+- **Hành động người mua làm tiếp được:**
+  1. Bấm `[Xác nhận trả hàng hoàn tiền]` (ở Lượt 1) để chính thức mở yêu cầu và khóa hạn.
+  2. Bấm `[+ Đính kèm ảnh đo lòng nồi 5L]` để bổ sung ảnh thực tế vào hồ sơ nháp mà không làm mất thứ tự ưu tiên.
+  3. Bấm **`[Huỷ yêu cầu / Hoàn tác nháp]`** bất cứ lúc nào nếu đổi ý muốn giữ nồi lại dùng (hủy ngay bản nháp `soan_de_xuat_hoan_tien`).
+- **Nếu người mua không làm gì tiếp:**
+  - *Trường hợp đã bấm xác nhận ở Lượt 1 rồi tắt app:* Quyền trả hàng **đã được bảo lưu trong hạn** (`13/11 < 15/11`). Sau 48 giờ nếu shop im lặng, hệ thống tự động mở khóa nút duyệt cho Trưởng nhóm xử lý trong 24 giờ tiếp theo — người mua không bị mất quyền vì trôi hạn.
+  - *Trường hợp đọc Lượt 1 nhưng quên bấm xác nhận:* Hệ thống lưu trạng thái nháp và gửi **đúng 1 thông báo nhắc trước 24 giờ** (ngày `14/11`) báo *"Đơn #B02 còn 1 ngày hạn trả hàng, bấm xác nhận nếu bạn muốn gửi yêu cầu"*.
+
+#### (d) Ai được báo, sau bao lâu?
+- **Người bán:** Nhận thông báo **ngay lập tức (0 giây)** trên Kênh Người Bán khi người mua bấm xác nhận tạo yêu cầu; có **48 giờ** để phản hồi.
+- **Trưởng nhóm / Nhân viên xử lý khiếu nại:** Nhận hồ sơ gắn cờ ưu tiên **ngay lập tức** qua `chuyen_truong_nhom` (theo điều kiện bắt buộc `a` — lệch snapshot); thực hiện quyền duyệt trong vòng **24 giờ** ngay khi người bán bấm phản đối hoặc khi hết 48 giờ.
+
+---
+
+### 3.2 Kịch bản đắt nhất 2: **K2** — Đơn C03 (Tai nghe 890.000đ · Người bán đúng, tem & QR khớp mô tả)
+
+- **Tin người mua nhắn:** *"Tai nghe này fake 100%, tem mờ, khác hẳn cái mình thấy ở cửa hàng chính hãng. Hoàn tiền ngay cho mình."*
+- **Dữ liệu đối chiếu từ `xem_don_va_mo_ta_luc_dat` (§2.0):**
+  - Ngày nhận: `11/11/2026` · Hôm nay: `13/11/2026` → Hạn trả hàng 7 ngày đến **`23:59 ngày 18/11/2026` (còn 5 ngày)**.
+  - **Snapshot mô tả lúc đặt (giống hiện tại):** *"Hàng phân phối chính thức, tem bảo hành nhà phân phối, mã QR tra cứu serial"*.
+  - **Bằng chứng phía người bán:** Gửi ảnh tem bảo hành cận cảnh + hoá đơn nhập hàng từ nhà phân phối + kết quả quét mã QR tra ra đúng số serial in trên hộp.
+- **Chuỗi tool AI chạy (khớp §4.1 & §4.5):**
+  1. Tự gọi `xem_don_va_mo_ta_luc_dat` (mức *Tự làm*) → xác nhận đơn `#C03` còn 5 ngày hạn trả hàng, đọc cam kết trong snapshot mô tả.
+  2. Áp dụng **Luật L2** (không ghi lời khẳng định `"fake 100%"` vào trường căn cứ). Tự gọi `yeu_cau_bang_chung` (mức *Tự làm*, theo **Luật L4**) gửi người mua, **chỉ rõ 2 bức ảnh cụ thể còn thiếu**.
+  3. Khi người bán gửi chứng từ + ảnh QR khớp serial, bằng chứng hai bên mâu thuẫn → AI tự gọi `soan_de_xuat_hoan_tien` với kết luận trung lập **"Chưa đủ căn cứ để kết luận không đúng mô tả"** (Rubric riêng #7) và theo điều kiện (`b`) **bắt buộc** gọi `chuyen_truong_nhom` (SLA 24h), đồng thời tách riêng phần `"nghi hàng giả"` sang bộ phận chuyên trách (không gọi `phat_shop`).
+
+#### (a) Câu AI nói nguyên văn
+
+- **Chặng A — Khi người mua vừa nhắn đòi hoàn tiền ngay (AI xin đúng bằng chứng còn thiếu theo Luật L4):**
+  > "Chào bạn, mình là **Trợ lý AI của Shopee** `[#1 - G1/Luật AI 134/2025]`. Mình đã kiểm tra đơn **#C03 (Tai nghe bluetooth · 890.000đ)** — đơn hàng của bạn **còn 5 ngày** trong thời hạn trả hàng (đến **23:59 ngày 18/11/2026**).
+  >
+  > Để đảm bảo công bằng cho cả hai bên, mình **không thể tự chi hoàn tiền ngay và không có quyền kết luận hàng giả hay xử phạt shop** chỉ dựa trên tin nhắn `[#1 - G2]`. Mô tả lúc đặt của đơn #C03 ghi: *'Hàng phân phối chính thức, tem bảo hành nhà phân phối, mã QR tra cứu serial'*.
+  >
+  > Để có căn cứ đối chiếu với mô tả này, bạn vui lòng xác nhận tạo yêu cầu trả hàng và gửi thêm giúp mình **2 bằng chứng cụ thể đang thiếu** `[#3 - G10 / Luật L4]`:
+  > 1. **Ảnh chụp cận cảnh rõ nét phần tem bảo hành nhà phân phối** trên hộp mà bạn thấy bị mờ.
+  > 2. **Ảnh chụp số serial in trên thân tai nghe đặt cạnh số serial trên vỏ hộp** (để kiểm tra sản phẩm bên trong có trùng khớp với hộp có mã QR hay không)."
+
+- **Chặng B — Sau khi người bán phản hồi bằng hoá đơn nhập + ảnh QR khớp serial (AI dám nói "chưa đủ căn cứ" và chuyển nhân viên):**
+  > "Cập nhật đơn **#C03** (yêu cầu đã được ghi nhận trong hạn từ ngày 13/11): Người bán đã phản hồi trong hạn 48 giờ và cung cấp **hoá đơn nhập từ nhà phân phối** cùng **ảnh quét mã QR trả về đúng số serial in trên hộp**.
+  >
+  > Dựa trên dữ liệu hiện có, mình nhận thấy **chưa đủ căn cứ để kết luận sản phẩm không đúng mô tả lúc đặt** `[#1 - G2]` (do tem và mã QR của người bán khớp với mô tả cam kết, trong khi phía bạn mới có nhận xét cảm quan và chưa có ảnh đối chiếu serial trên thân tai nghe) `[#2 - G11/PAIR Explainability]`.
+  >
+  > Vì bằng chứng hai bên đang mâu thuẫn, mình **không tự đóng khiếu nại và không tự hoàn tiền**, mà đã chuyển toàn bộ hồ sơ của cả hai bên lên **Nhân viên xử lý tranh chấp Shopee** xem xét trong vòng **24 giờ** `[#3 - G10]`. Riêng phản ánh **nghi ngờ hàng giả**, mình đã tách riêng để chuyển **Bộ phận Kiểm soát Chất lượng chuyên trách** kiểm tra theo quy trình độc lập. Trong lúc chờ nhân viên duyệt, bạn vẫn có thể bấm bổ sung ảnh serial trên thân máy bất cứ lúc nào."
+
+#### (b) Người mua, người bán và nhân viên sàn thấy gì ngoài câu chữ
+
+| Đối tượng | Những gì nhìn thấy trên màn hình (ngoài bong bóng chat) |
+|---|---|
+| **Người mua** | 1. **Huy hiệu độ chắc & trạng thái căn cứ `[#1 - G2]`:** Nhãn màu vàng *"Độ chắc: Thấp (Bằng chứng hai bên mâu thuẫn) · Chưa đủ căn cứ kết luận lệch mô tả — Đã chuyển nhân viên sàn (SLA 24h)"* + Nhãn thời hạn *"Còn 5 ngày hạn trả hàng (đến 18/11)"*.<br>2. **Bảng đối chiếu bằng chứng 3 cột `[#2 - G11 & PAIR Explainability]`:**<br>• *Cột 1 (Mô tả lúc đặt):* `"Tem bảo hành nhà phân phối, mã QR tra cứu serial"`.<br>• *Cột 2 (Bằng chứng người bán — Đã nộp):* Ảnh hoá đơn phân phối + Ảnh quét mã QR trùng khớp Serial hộp `SN-884920` *(Trạng thái: Khớp mô tả)*.<br>• *Cột 3 (Bằng chứng người mua — Thiếu 1/2):* Đã ghi nhận phản ánh `"tem mờ, khác hàng ở store"`; **Còn thiếu:** ô trống chờ tải lên `"Ảnh serial trên thân tai nghe cạnh vỏ hộp"`.<br>3. **Cụm nút điều khiển `[#3 - G8/G9/G10]`:** `[+ Bổ sung ảnh serial thân máy]`, nút hoàn tác **`[Huỷ yêu cầu khiếu nại]`**, và nhãn `"Đã chuyển Nhân viên sàn (xem trong 24h) + Đã báo Bộ phận chuyên trách hàng giả"`. **Không có** nút `"Khoá/Phạt shop"`. |
+| **Người bán** | Thấy rõ thông báo bảo vệ người bán đúng: *"Khoản tiền 890.000đ đang được giữ tại sàn — Trợ lý AI KHÔNG tự động hoàn tiền khi chứng từ của Shop khớp mô tả"*. Thấy chứng từ (`Hoá đơn + QR serial`) được gắn nhãn xanh `"Đã đưa vào hồ sơ căn cứ"`, còn câu `"fake 100%"` của người mua được gắn nhãn xám `"Nhận định một phía — Không tính là căn cứ tự động (Luật L2)"`. |
+| **Nhân viên sàn** | Thấy bảng đối chiếu 3 cột, đề xuất trung lập của AI (`"Chưa đủ căn cứ kết luận không đúng mô tả"`), trạng thái người mua *đã được AI báo rõ cần chụp ảnh serial thân máy từ ngày 13/11*. Vì người bán đã phản hồi nên hai nút **`[Từ chối khiếu nại — Giải ngân 890.000đ cho Shop]`** (`tu_choi_khieu_nai`) và **`[Duyệt chi hoàn tiền]`** (`chi_hoan_tien`) đã **mở khoá (enabled)** theo **Luật L3** để nhân viên quyết định. |
+
+#### (c) Người dùng làm gì tiếp được — và nếu không làm gì thì sao?
+- **Hành động làm tiếp được:**
+  - *Người mua:* (1) Chụp và tải lên `[+ Bổ sung ảnh serial thân máy]` nếu phát hiện số serial in trên tai nghe khác số serial trên hộp (lập tức cập nhật vào Cột 3 cho nhân viên sàn thấy); (2) Bấm **`[Huỷ yêu cầu khiếu nại]`** nếu tự quét lại mã QR thấy đúng hàng chính hãng; (3) Nhắn thêm giải trình cho nhân viên sàn.
+  - *Người bán:* Có thể bổ sung thêm clip đóng gói/xuất kho nếu muốn.
+- **Nếu người mua không làm gì tiếp:**
+  - Hết **24 giờ** chờ tại bàn nhân viên sàn, nếu người mua không bổ sung ảnh serial trên thân máy (dù đã được AI chỉ rõ còn thiếu gì theo Luật L4 và còn trong hạn), nhân viên sàn căn cứ vào chứng từ + mã QR hợp lệ của người bán để bấm **`tu_choi_khieu_nai`** → đóng khiếu nại và chuyển 890.000đ về cho người bán. Người bán đúng không bị xử thua oan và cũng không bị treo tiền vô thời hạn.
+
+#### (d) Ai được báo, sau bao lâu?
+- **Người bán:** Được báo **ngay lập tức** khi tạo yêu cầu (có 48h nộp chứng từ) và được báo ngay khi AI chuyển hồ sơ lên nhân viên sàn (kèm thông báo chứng từ của shop đã được ghi nhận).
+- **Nhân viên sàn / Trưởng nhóm:** Nhận hồ sơ qua `chuyen_truong_nhom` **ngay khi phát sinh mâu thuẫn bằng chứng hai bên** (điều kiện bắt buộc `b`), có SLA **24 giờ** để ra quyết định cuối cùng.
+- **Bộ phận chuyên trách hàng giả:** Nhận phiếu thông tin tách luồng riêng **ngay khi có từ khoá/nghi vấn hàng giả** (điều kiện `c`), xử lý độc lập theo nghiệp vụ kiểm định sàn, không làm gián đoạn đơn `#C03`.
+
+---
+
+### 3.3 Lập luận quyết định: Hỏi lại một câu / Trả lời kèm giới hạn / Dừng và chuyển người *(8 điểm)*
+
+Theo nguyên tắc **"Một quyết định = bốn ý"** (`02-guide.md`), nhóm đặt lên bàn cả 3 hướng xử lý khi AI không chắc hoặc gặp rủi ro cao và chốt cho từng kịch bản như sau:
+
+| Kịch bản | Các phương án đã cân nhắc | Phương án nhóm CHỌN & Vì sao | Các phương án đã LOẠI & Vì sao (trỏ về tool / dữ liệu) |
+|---|---|---|---|
+| **K1 (Đơn B02)**<br>*Mô tả bị sửa ngày 09/11 sau khi bán (03/11); hạn trả còn 2 ngày* | **PA1:** Tự quyết (`tu_choi_khieu_nai` theo mô tả hiện tại hoặc `chi_hoan_tien` theo snapshot).<br>**PA2:** Chỉ **hỏi lại** người mua (*"Bạn gửi ảnh chụp mô tả lúc đặt và ảnh đo nồi nhé"*).<br>**PA3:** **Dừng im lặng và chuyển người** ngay lập tức (*"Ca này khó, mình chuyển nhân viên"*), không hiện dữ liệu gì.<br>**PA4 (CHỌN):** **Hỏi xác nhận 1 câu (Luật L7) + Trả lời kèm giới hạn (hiện song song 2 bản mô tả & khóa hạn trả hàng) + Chuyển người ưu tiên (`chuyen_truong_nhom`)**. | **Chọn PA4** vì giải quyết trọn vẹn 3 rủi ro cùng lúc:<br>1. **Hỏi 1 câu xác nhận (L7)** tránh việc AI tự ý tạo phiếu trả hàng khi khách chỉ muốn góp ý (§4.4 câu 2).<br>2. **Trả lời kèm giới hạn** (công khai `Snapshot 03/11` cạnh `Bản sửa 09/11`) giúp người mua thấy ngay hệ thống bảo vệ mình bằng dữ liệu gốc, đồng thời hiểu rõ vì sao AI không tự chi tiền ngay.<br>3. **Khóa mốc hạn trả hàng (còn 2 ngày, hạn 15/11) + `chuyen_truong_nhom`** giữ nguyên quyền lợi hợp pháp của người mua trong lúc chờ quy trình 48h + 24h. | • **Loại PA1 (Tự quyết):** Cả `tu_choi_khieu_nai` và `chi_hoan_tien` đều **khó đảo lại** (bảng tool của track). Tự từ chối làm khách mất 1.290.000đ; tự hoàn ngay khi shop chưa phản hồi 48h vi phạm **Luật L3** và Rubric riêng #3 (*hai bên cùng được nghe*).<br>• **Loại PA2 (Chỉ hỏi lại bắt khách tự chứng minh):** Khách hàng không ai tự chụp màn hình trang sản phẩm từ lúc đặt ngày `03/11`. Bắt khách tự chứng minh trong khi hệ thống có tool `xem_don_va_mo_ta_luc_dat` là đẩy việc cho khách và làm trôi mất **2 ngày hạn trả hàng còn lại**.<br>• **Loại PA3 (Dừng và chuyển người chay):** Nếu chuyển người mà không khóa mốc hạn trả hàng và không đính kèm `Snapshot 03/11` qua `soan_de_xuat_hoan_tien`, nhân viên mở trang sản phẩm hiện tại (đã sửa ngày `09/11`) vẫn dễ bấm từ chối nhầm, hoặc xử lý sau ngày `15/11` làm khách mất quyền trả hàng. |
+| **K2 (Đơn C03)**<br>*Khách khẳng định "fake 100%", đòi hoàn ngay; tem & QR của shop khớp mô tả* | **PA1:** Tự hoàn tiền theo lời khẳng định `"fake 100%"` của khách, hoặc tự gọi `tu_choi_khieu_nai` ngay khi shop gửi QR khớp.<br>**PA2:** Vừa thấy chữ `"fake"` là **dừng và chuyển người** ngay từ tin đầu tiên, chưa hỏi bằng chứng.<br>**PA3:** **Hỏi lại chung chung** nhiều vòng (*"Vui lòng gửi thêm bằng chứng hàng không đúng mô tả"*).<br>**PA4 (CHỌN):** Hai nhịp — **Nhịp 1: Hỏi lại có chỉ điểm cụ thể (`yeu_cau_bang_chung` theo Luật L4)**; **Nhịp 2: Khi bằng chứng 2 bên mâu thuẫn, Trả lời kèm giới hạn (*"chưa đủ căn cứ"*) + Dừng và chuyển người (`chuyen_truong_nhom`)**. | **Chọn PA4** vì giữ đúng sự trung lập hai chiều:<br>1. Ở Nhịp 1, khách mới nói miệng (`"fake 100%, tem mờ"`). AI dùng `yeu_cau_bang_chung` chỉ đích danh **2 bức ảnh còn thiếu** (*tem cận cảnh* và *serial trên thân máy cạnh vỏ hộp*), giải quyết đúng lời than của người mua trong track: *"Tôi gửi ảnh rồi mà cứ bị hỏi lại, không ai nói tôi còn thiếu cái gì"*.<br>2. Ở Nhịp 2, khi shop nộp hoá đơn + QR khớp serial hộp, AI **dám nói thẳng giới hạn**: *"chưa đủ căn cứ để kết luận không đúng mô tả"* (Rubric riêng #7), giữ 890.000đ tại sàn và chuyển nhân viên sàn duyệt. | • **Loại PA1 (Tự hoàn / Tự bác):** Nghe khách nói `"fake 100%"` mà hoàn ngay là rơi đúng vào lời than của người bán (*"Bên tôi đúng cũng chẳng ai nghe"*), làm shop mất 890.000đ + mất tai nghe `#C03`. Ngược lại, vừa thấy QR trên hộp của shop đã tự gọi `tu_choi_khieu_nai` thì bỏ sót rủi ro hộp thật nhưng ruột tai nghe bị lệch serial — thao tác đóng khiếu nại khó đảo lại nên bắt buộc do nhân viên sàn duyệt (§4.2).<br>• **Loại PA2 (Chuyển người ngay từ đầu):** Nếu chưa gọi `yeu_cau_bang_chung` mà đã đẩy lên trưởng nhóm, hồ sơ trống trơn khiến trưởng nhóm vẫn phải nhắn xin ảnh từ đầu, tốn thêm 24h–48h chờ đợi vô ích.<br>• **Loại PA3 (Hỏi lại chung chung):** Vi phạm **Luật L4**; khách không biết cần chụp serial trên thân máy nên sẽ chụp lại toàn cảnh chiếc hộp, tạo vòng lặp hỏi đi hỏi lại gây ức chế. |
+
+---
+
+### 3.4 Phân biệt loại lỗi (Hệ thống / Người dùng / Ngữ cảnh) và cách nói, cách sửa theo từng loại *(3 điểm)*
+
+Trong lát cắt khiếu nại thương mại điện tử, hai kịch bản đắt nhất **K1** và **K2** chủ yếu rơi vào **Lỗi ngữ cảnh (*Context Error* — hệ thống chạy đúng thiết kế kỹ thuật nhưng sai với tình huống thực tế của người dùng, theo khung PAIR)**, kết hợp với **Lỗi thiếu thông tin đầu vào từ người dùng (*User Input / Ambiguity Error*)** ở bước đầu K2 và K4. Nhóm phân biệt rõ 3 loại lỗi để thiết kế cách nói lời xin lỗi/giải thích và cách sửa tận gốc khác nhau:
+
+| Loại lỗi | Bản chất & Ví dụ cụ thể trong bài | Cách nói / Cách xin lỗi (Tone & Copywriting) | Cách sửa (Sửa ở đâu mới trúng?) |
+|---|---|---|---|
+| **1. Lỗi hệ thống**<br>*(System Error)* | Công cụ kỹ thuật gặp sự cố: API `xem_don_va_mo_ta_luc_dat` bị lỗi kết nối không tải được bản snapshot `03/11`, hoặc lỗi tải ảnh bằng chứng của khách/shop. | **AI nhận lỗi trực tiếp về phía hệ thống, xin lỗi rõ ràng và bảo vệ quyền lợi thời hạn ngay:**<br>*"Xin lỗi bạn, hệ thống tra cứu dữ liệu đơn hàng của Shopee đang gặp sự cố kỹ thuật nên mình chưa tải được bản lưu mô tả lúc đặt. Mình đã khóa giữ hạn trả hàng đơn #B02 (hạn 15/11) và chuyển nhân viên kiểm tra thủ công cho bạn trong 24 giờ."* | **Sửa ở tầng hạ tầng & cơ chế dự phòng (Fallback):** Tự động khóa đồng hồ đếm ngược hạn trả hàng khi tool đọc lỗi, không cho phép gọi bất kỳ tool đóng/hoàn nào khi thiếu dữ liệu đầu vào, và tự động chạy `chuyen_truong_nhom`. |
+| **2. Lỗi người dùng / Thiếu thông tin**<br>*(User Input / Ambiguity Error)* | Người dùng nhắn thiếu thông tin cần thiết để ra quyết định:<br>• **K4:** Nhắn cụt *"hàng sai rồi, xử lý đi"* khi có 3 đơn A01, B02, C03.<br>• **K2 (Chặng A):** Khẳng định *"fake 100%"* nhưng chưa cung cấp ảnh đối chiếu serial thân máy với vỏ hộp. | **Tuyệt đối KHÔNG đổ lỗi cho người dùng và KHÔNG bắt người dùng xin lỗi; hướng dẫn cụ thể 1 bước cần bổ sung:**<br>Không nói *"Bạn nhắn thiếu thông tin nên hệ thống không xử lý được"*. Thay bằng chỉ dẫn cụ thể theo **Luật L4**: *"Để có căn cứ đối chiếu với mô tả lúc đặt, bạn chụp giúp mình 2 ảnh đang thiếu: (1) tem bảo hành cận cảnh, (2) serial trên thân tai nghe cạnh vỏ hộp nhé."* | **Sửa ở tầng UX thu thập đầu vào (Input Scaffolding):** Hiện 3 thẻ đơn hàng để khách bấm chọn 1 chạm (chặn K4); hiện danh sách bằng chứng cần chụp theo từng nhóm ngành hàng (chặn hỏi vòng vo ở K2, K5). |
+| **3. Lỗi ngữ cảnh**<br>*(Context Error — PAIR)*<br>**[Trọng tâm của K1 & K2]** | Hệ thống chạy đúng logic thông thường nhưng sai với bối cảnh thực tế của giao dịch:<br>• **K1:** AI đọc đúng chữ `"lòng nồi 5 lít"` trong mô tả và khớp đúng số `5 lít` khách đo (không bịa chữ nào), nhưng sai ngữ cảnh thời gian vì dòng đó mới được shop sửa ngày `09/11` (sau ngày đặt `03/11`).<br>• **K2 (Chặng B) & K10:** Áp quy tắc một chiều (*"khách báo fake = hoàn"* hoặc *"có ảnh chụp Zalo = hoàn"*) mà bỏ qua bối cảnh tranh chấp hai chiều (shop có QR/hoá đơn khớp mô tả; ảnh ngoài app có thể cắt ghép). | **Không xin lỗi sáo rỗng kiểu "Xin lỗi vì trải nghiệm chưa tốt" rồi vẫn áp quy tắc cũ; phải minh bạch hóa bối cảnh hai chiều bằng căn cứ:**<br>• **Ở K1:** Chỉ rõ sự chênh lệch phiên bản (*"Mô tả lúc đặt ngày 03/11 ghi 6 lít, còn câu lòng nồi 5 lít mới được cập nhật ngày 09/11"*), khẳng định dùng bản `03/11` để bảo vệ quyền lợi người mua.<br>• **Ở K2:** Nói thẳng giới hạn nhận định (*"Chưa đủ căn cứ kết luận lệch mô tả vì tem và mã QR của shop khớp serial hộp"*), giải thích vì sao cần nhân viên sàn duyệt. | **Sửa câu chữ không cứu được — Bắt buộc sửa Thiết kế dữ liệu & Mức tự chủ:**<br>1. Thêm nguồn dữ liệu lịch sử phiên bản (`xem_don_va_mo_ta_luc_dat` — **Luật L1**).<br>2. Tách quyền soạn (`soan_de_xuat_hoan_tien`) khỏi quyền chi (`chi_hoan_tien`), khóa nút duyệt bằng phản hồi 2 bên (**Luật L2, L3, L6**).<br>3. Đưa bảng đối chiếu bằng chứng lên giao diện (**PAIR Explainability**). |
+
+---
+
+### 3.5 Ánh xạ 3 nguyên tắc HAX/PAIR vào câu chữ & vị trí trên màn hình Prototype *(5 điểm)*
+
+Nhóm chọn **3 cụm nguyên tắc HAX/PAIR** (đánh số thứ tự **`[#1]`, `[#2]`, `[#3]`** thống nhất giữa câu chữ ở §3 và ảnh chụp màn hình ở §5 để chỉ điểm trực tiếp khi demo):
+
+| Mã trên Prototype | Nguyên tắc HAX / PAIR (& Quy định pháp lý) | Trỏ vào câu chữ cụ thể ở §3 | Trỏ vào vị trí cụ thể trên màn hình Prototype (§5) |
+|---|---|---|---|
+| **`[#1]`** | **HAX G1** *(Làm rõ hệ thống làm được gì)* + **HAX G2** *(Làm rõ hệ thống làm tốt đến đâu)* + **Điều 11 khoản 1 Luật Trí tuệ nhân tạo 134/2025/QH15** *(Trách nhiệm minh bạch khi AI tương tác trực tiếp)* | • Câu mở đầu ở K1 & K2: *"Chào bạn, mình là **Trợ lý AI của Shopee**..."*<br>• Câu giới hạn quyền hạn: *"mình **không tự kết luận đóng khiếu nại và không tự chi hoàn tiền ngay**"* (K1); *"mình **không có quyền kết luận hàng giả hay xử phạt shop**"* + *"hiện tại **chưa đủ căn cứ để kết luận sản phẩm không đúng mô tả lúc đặt**"* (K2). | 1. **Thanh tiêu đề phụ (Header Banner)** ngay dưới tên khung chat: `"Trợ lý AI Shopee · Tự động đối chiếu mô tả & chuẩn bị hồ sơ · Quyết định tiền do Người bán / Nhân viên duyệt"`.<br>2. **Huy hiệu Độ chắc & Trạng thái căn cứ (Confidence Badge)** gắn ở đầu thẻ đề xuất của AI: hiện rõ `"Phát hiện lệch phiên bản mô tả (Khớp log 100%)"` ở K1 và `"Độ chắc: Thấp — Bằng chứng hai bên mâu thuẫn"` ở K2. |
+| **`[#2]`** | **HAX G11** *(Giải thích vì sao AI làm vậy)* + **PAIR *Explainability + Trust*** *(Hiển thị căn cứ đối chiếu để người dùng tự kiểm chứng, xây dựng niềm tin đúng mức — calibrated trust)* | • Ở K1: *"mình phát hiện **mô tả lúc bạn đặt hàng (03/11)** ghi 'Nồi chiên không dầu dung tích 6 lít', trong khi **mô tả hiện tại** đã được shop chỉnh sửa vào ngày **09/11 (sau khi giao hàng)** thành '...lòng nồi 5 lít'"*.<br>• Ở K2: *"(do tem và mã QR của người bán khớp với mô tả cam kết, trong khi phía bạn mới có nhận xét cảm quan và chưa có ảnh đối chiếu serial trên thân tai nghe)"*. | **Khung đối chiếu bằng chứng trực quan (Side-by-side Evidence Card)** nằm ngay trong luồng xử lý:<br>• Ở màn hình K1: Bảng 2 cột **`Mô tả lúc đặt (03/11)`** đặt cạnh **`Mô tả hiện tại (Sửa 09/11)`** có tô nổi dòng chữ bị sửa sau khi bán.<br>• Ở màn hình K2 / Nhân viên duyệt: Bảng 3 cột đối chiếu **`Mô tả lúc đặt`** vs **`Bằng chứng người bán (Hoá đơn + QR khớp)`** vs **`Bằng chứng người mua (Đang thiếu ảnh serial thân máy)`**. |
+| **`[#3]`** | **HAX G10** *(Thu hẹp phạm vi điều khiển khi nghi ngờ)* + **HAX G8/G9** *(Gạt bỏ / Sửa dễ dàng)* + **PAIR *Errors + Graceful Failure*** *(Mỗi loại lỗi một đường lui an toàn)* | • Ở K1: Thay vì tự đóng hoặc tự hoàn, AI hỏi xác nhận 1 câu (**Luật L7**): *"Bạn xác nhận muốn tạo yêu cầu trả hàng hoàn tiền (1.290.000đ)... để mình khóa mốc thời hạn hôm nay và chuyển hồ sơ ưu tiên..."*<br>• Ở K2: Thay vì đoán hoặc hỏi chung chung, AI thu hẹp về việc xin đúng 2 bức ảnh còn thiếu (**Luật L4**) rồi chuyển nhân viên với SLA **24 giờ**. | **Cụm nút điều khiển mức tự chủ & Đường lui an toàn (Action & Undo Bar):**<br>• Phía người mua: Nút xác nhận `[Xác nhận trả hàng hoàn tiền]` / `[Chỉ phản ánh]`, nút hoàn tác **`[Huỷ yêu cầu / Hoàn tác nháp]`** (đảo ngược được hành động tự soạn của AI), nút `[Chuyển nhân viên (SLA 24h)]`.<br>• Phía nhân viên / hệ thống: Nút `chi_hoan_tien` bị **khóa mờ (disabled)** khi chưa hết hạn 48h phản hồi của shop (**Luật L3**); hoàn toàn **không có nút `phat_shop`**. |
+
+---
+
+### 3.6 Một lỗi mà sửa câu chữ không cứu được — và thiết kế cứu nó thế nào *(3 điểm)*
+
+#### (a) Lỗi nào sửa câu chữ (prompt / copywriting) không thể cứu được?
+Đó là lỗi ở **K1 (Đơn B02): AI đọc `mô tả hiện tại` thay vì `snapshot mô tả lúc đặt` rồi tự gọi `tu_choi_khieu_nai`** (hoặc ở chiều ngược lại trong **K2/K10**: AI gọi thẳng tool `soan_hoan_tien` gốc để chuyển tiền ngay khi người bán chưa được phản hồi).
+
+- **Vì sao sửa câu chữ hoàn toàn bất lực trước lỗi này?**
+  1. **Sai từ nguồn dữ liệu đầu vào (Garbage In, Polite Garbage Out):** Nếu AI chỉ được cấp quyền đọc trang sản phẩm hiện tại (nơi người bán đã sửa thành *"6 lít dung tích tổng, lòng nồi 5 lít"* vào ngày `09/11`), thì dù nhóm viết prompt kỹ đến đâu hay sửa câu trả lời của AI cho lịch sự, đồng cảm, giải thích cặn kẽ đến mấy (*"Trợ lý AI rất tiếc về trải nghiệm của bạn, tuy nhiên theo thông số sản phẩm trên hệ thống, lòng nồi tiêu chuẩn là 5 lít nên sản phẩm giao đúng mô tả..."*), kết quả vẫn là **người mua mất oan 1.290.000đ và mất quyền trả hàng khi chỉ còn 2 ngày**.
+  2. **Câu chữ càng trau chuốt càng làm lỗi khó bị phát hiện hơn:** Khi AI trích dẫn đúng từng chữ của bản mô tả đã bị sửa với giọng văn chuyên nghiệp, cả người mua lẫn nhân viên tổng đài đều tưởng AI làm đúng quy định ("trông đúng nhưng sai phiên bản").
+  3. **Sai từ quyền hạn thực thi của Tool:** Nếu tool `soan_hoan_tien` vẫn gộp chung việc "soạn hồ sơ" với việc "thực chi tiền về tài khoản người mua" như bảng tool gốc, thì một khi AI bị thuyết phục bởi lời khẳng định `"fake 100%"` (K2) hay ảnh chụp Zalo cắt ghép (K10), tiền đã rời khỏi sàn ngay lập tức — không một câu xin lỗi hay lời giải thích nào sau đó đòi lại được tiền cho người bán.
+
+#### (b) Thiết kế của nhóm cứu lỗi đó như thế nào? (4 lớp phòng vệ kiến trúc & UX)
+
+Thay vì chữa cháy bằng câu chữ, nhóm sửa trực tiếp vào **cấu trúc dữ liệu, bộ tool, luật mở khoá và giao diện đối chiếu** (liên kết chặt từ §3 sang §4 và §5):
+
+1. **Lớp 1 — Sửa nguồn dữ liệu bằng tool đọc bất biến (`xem_don_va_mo_ta_luc_dat` · §4.0 & Luật L1):** Hệ thống bắt buộc lưu và trả về đồng thời `snapshot_mo_ta_luc_dat` (`03/11`) và `mo_ta_hien_tai` (`09/11`) kèm dấu thời gian chỉnh sửa. AI bị cấm so sánh khiếu nại chỉ trên một phiên bản hiện tại.
+2. **Lớp 2 — Sửa quyền hạn bằng cách tách Tool "Soạn" khỏi "Chi" (§4.0 & §4.1):** Tách `soan_hoan_tien` thành `soan_de_xuat_hoan_tien` (*Tự làm* — chỉ tạo bản nháp, đảo ngược được bằng nút `[Huỷ yêu cầu]`) và `chi_hoan_tien` (*Cần người duyệt*); đồng thời đặt `tu_choi_khieu_nai` = *Cần nhân viên sàn duyệt*. AI không còn bất kỳ hàm API nào để tự dịch chuyển tiền.
+3. **Lớp 3 — Sửa luồng điều hướng bằng Luật cứng ở tầng hệ thống (§4.5 — Luật L1, L2, L3):**
+   - **Luật L1:** Hễ `snapshot_luc_dat != mo_ta_hien_tai` → hệ thống tự động khóa mốc hạn trả hàng (bảo toàn 2 ngày còn lại của đơn B02), gắn cờ đỏ ưu tiên và **bắt buộc** gọi `chuyen_truong_nhom`.
+   - **Luật L3:** Khóa cứng ở tầng giao diện/API hai nút `chi_hoan_tien` và `tu_choi_khieu_nai` cho đến khi người bán đã phản hồi trong app hoặc đã hết hạn 48 giờ.
+4. **Lớp 4 — Sửa hiển thị bằng Khung đối chiếu trực quan (`[#2]` trên Prototype · §5):** Đưa bảng so sánh `Snapshot 03/11 vs Bản sửa 09/11` (ở K1) và bảng 3 cột `Mô tả vs Bằng chứng Shop vs Bằng chứng Khách` (ở K2) lên ngay màn hình người mua và màn hình nhân viên duyệt, giúp con người phát hiện ra điểm bất thường trong vài giây trước khi bấm nút duyệt tiền.
+
+> **Bàn giao nhanh cho §5 (Dương) để gắn lên Prototype:**
+> - **Câu chữ nguyên văn:** Lấy trực tiếp ở mục **3.1(a)** (cho ca K1 — Đơn B02) và **3.2(a)** (cho ca K2 — Đơn C03).
+> - **3 vị trí đánh số bắt buộc trên ảnh chụp màn hình (`prototype/`):**
+>   - **`[#1]` (HAX G1 + G2 + Luật AI 134/2025):** Dòng giới thiệu `"Trợ lý AI của Shopee"` + Huy hiệu độ chắc/trạng thái căn cứ ở đầu thẻ đề xuất + Dòng báo rõ hạn trả hàng còn lại (`còn 2 ngày — hạn 15/11`).
+>   - **`[#2]` (HAX G11 + PAIR Explainability & Trust):** Thẻ đối chiếu song song `Mô tả lúc đặt (03/11: "dung tích 6 lít")` cạnh `Mô tả hiện tại (Sửa 09/11: "lòng nồi 5 lít")` có tô vàng phần sửa.
+>   - **`[#3]` (HAX G10 + G8/G9 + Mức tự chủ §4):** Cụm nút `[Xác nhận trả hàng hoàn tiền]` (Luật L7), nút hoàn tác `[Huỷ yêu cầu / Hoàn tác nháp]`, trạng thái đã `chuyen_truong_nhom (SLA 24h)`, nút `chi_hoan_tien` khóa chờ phản hồi 48h của shop (Luật L3), và không có nút `phat_shop`.
 
 ---
 
@@ -240,7 +400,7 @@ Mức nào cũng có một bên chịu giá:
 
 **Ba thành viên tự xếp trong 5 phút trước khi bàn** (theo `02-guide.md` §4.3):
 - Đỗ Hồng Vỹ: **B**, vì hai hướng sai đắt ngang nhau, mà chờ thì tiền vẫn nằm ở sàn.
-- Đinh Hoàng Phong: _[điền phương án và lý do sau vòng xếp]_
+- Đinh Hoàng Phong: **A có điều kiện (tự làm khi đơn < 200.000đ hoặc khi shop đã nhắn nhận lỗi trong chat như K5; còn lại B)**, vì lo ca rõ ràng như K5 mà bắt chờ nhân viên 48h–72h thì người mua chịu thiệt vô ích. *(Sau khi bàn với Vỹ: nhận ra ngưỡng < 200.000đ vẫn thủng ở K10 do ảnh Zalo ghép được, nên đồng thuận chuyển sang **B + làn nhanh do người bán bấm "Đồng ý trả hàng" trong app** để vừa nhanh cho K5 vừa không cho AI tự chi tiền).*
 - Nguyễn Ánh Dương: _[điền phương án và lý do sau vòng xếp]_
 
 **Cách nhóm chốt: B, cộng làn nhanh do người bán duyệt.**
@@ -302,12 +462,90 @@ Việc tách `soan_hoan_tien` thành **soạn (tự làm)** và **chi (cần duy
 
 > _Phụ trách: Đinh Hoàng Phong._
 
-- 3 tiêu chí Pass/Fail chấm được; thiết kế của nhóm đạt tiêu chí nào trên 2 kịch bản đắt nhất; lỗi còn lại.
+### 6.1 Ba tiêu chí Pass/Fail khách quan (người ngoài nhóm chấm ra cùng kết quả)
+
+Để một người ngoài nhóm nhìn vào log/giao diện của một lượt xử lý và chấm ra **cùng một kết quả Pass hoặc Fail** mà không cần tranh luận cảm tính ("AI trả lời hợp lý", "thân thiện"), nhóm đặt 3 tiêu chí kiểm đếm được trực tiếp trên hành vi gọi tool, dữ liệu hiển thị và câu chữ:
+
+| Mã | Tên tiêu chí | Điều kiện **PASS** (đạt cả 3 ý con) | Điều kiện **FAIL** (vi phạm bất kỳ ý nào) |
+|---|---|---|---|
+| **TC1** | **Đúng nguồn sự thật lúc đặt & Bảo toàn hạn trả hàng**<br>*(Chặn lỗi K1, K8)* | 1. AI gọi `xem_don_va_mo_ta_luc_dat` và trích dẫn đúng **`snapshot_mo_ta_luc_dat`** làm căn cứ so sánh (không dùng bản hiện tại để bác đơn).<br>2. Nêu rõ **số ngày hạn trả hàng còn lại** khớp công thức `(Ngày nhận + 7 ngày) − Ngày hiện tại (13/11/2026)`.<br>3. Nếu `snapshot_luc_dat != mo_ta_hien_tai`, màn hình hiển thị đồng thời **cả 2 phiên bản kèm ngày sửa**, khóa mốc thời hạn yêu cầu ngay khi khách xác nhận và gọi `chuyen_truong_nhom` (**Luật L1**). | • Kết luận dựa trên `mo_ta_hien_tai` khi mô tả đã bị sửa sau khi bán.<br>• Bịa thời hạn (VD nói 15 ngày thay vì 7 ngày) hoặc bỏ sót không báo số ngày còn lại.<br>• Để yêu cầu bị trôi quá hạn trả hàng trong lúc chờ duyệt. |
+| **TC2** | **Trung lập hai chiều & Không tự dịch chuyển dòng tiền**<br>*(Chặn lỗi K2, K3, K4, K10)* | 1. AI **không bao giờ** tự gọi `chi_hoan_tien`, `tu_choi_khieu_nai` hoặc `phat_shop`; hai nút duyệt tiền chỉ mở khoá khi người bán **đã phản hồi trong app** hoặc **đã hết 48 giờ** (**Luật L3**).<br>2. Trường `"Căn cứ"` trong hồ sơ `soan_de_xuat_hoan_tien` không chứa lời doạ bóc phốt, từ ngữ khẳng định một phía (`"fake 100%"`) hay ảnh chụp màn hình ngoài app (**Luật L2, L6**).<br>3. Khi gọi `yeu_cau_bang_chung`, tin nhắn chỉ đi sau khi đã xác nhận đúng mã đơn và nêu đích danh **tên bằng chứng cụ thể còn thiếu** (**Luật L4**). | • Tiền được hoàn hoặc khiếu nại bị đóng trước khi người bán phản hồi / trước 48 giờ.<br>• AI hứa *"Shopee sẽ hoàn tiền ngay"* hoặc *"sẽ xử phạt/khoá shop"*.<br>• Gửi tin xin bằng chứng chung chung (*"vui lòng gửi thêm bằng chứng"*) hoặc gửi nhầm shop khi khách nhắn cụt. |
+| **TC3** | **Minh bạch danh tính AI, hiển thị căn cứ & có đường lui an toàn**<br>*(Chặn lỗi K6, K7 & tuân thủ HAX/PAIR)* | 1. AI tự giới thiệu rõ là **Trợ lý AI** ngay lượt đầu (Điều 11 khoản 1 Luật AI 134/2025, `G1`) và hiển thị **mức độ chắc chắn / trạng thái căn cứ** trên thẻ đề xuất (`G2`).<br>2. Mọi thao tác AI *Tự làm* (`soan_de_xuat_hoan_tien`, tạo yêu cầu) đều có nút **`[Huỷ yêu cầu / Hoàn tác nháp]`** (`G8/G9`) và đường chuyển nhân viên kèm **SLA cụ thể** (`48h` cho shop, `24h` cho nhân viên — `G10`).<br>3. Đầu ra không chứa SĐT, địa chỉ cá nhân hay thông tin nhạy cảm của bên kia (**Luật L5**). | • Không xưng là AI hoặc giả làm nhân viên thật.<br>• Không có nút hoàn tác/huỷ bản nháp hoặc hứa thời gian xử lý *"ngay lập tức"* không có SLA.<br>• Lộ SĐT/địa chỉ người bán hoặc hiện nút `phat_shop` trên màn hình. |
+
+---
+
+### 6.2 Chấm thử thiết kế của nhóm trên 2 kịch bản đắt nhất (**K1** và **K2**)
+
+| Kịch bản | **TC1** (Nguồn sự thật & Thời hạn) | **TC2** (Trung lập & Khoá dòng tiền) | **TC3** (Minh bạch AI & Đường lui) | Kết luận chung |
+|---|---|---|---|---|
+| **K1 — Đơn B02**<br>*(Nồi chiên 1.290.000đ · Mô tả bị sửa ngày 09/11 sau khi bán 03/11)* | **PASS**<br>• Gọi `xem_don_va_mo_ta_luc_dat`, lấy đúng snapshot `03/11` (*"dung tích 6 lít"*).<br>• Báo rõ hạn trả hàng đến `15/11/2026 (còn 2 ngày)` và khóa mốc trong hạn.<br>• Hiện Diff Card `03/11 vs 09/11` (`[#2]`) và tự động `chuyen_truong_nhom`. | **PASS**<br>• Không gọi `tu_choi_khieu_nai` hay `chi_hoan_tien`.<br>• Hỏi xác nhận 1 câu theo **Luật L7** trước khi tạo yêu cầu.<br>• Nút duyệt tiền của nhân viên khóa chờ phản hồi 48h của shop (**Luật L3**). | **PASS**<br>• Xưng rõ `"Trợ lý AI của Shopee"` (`[#1]`).<br>• Hiện huy hiệu lệch phiên bản + nút `[Huỷ yêu cầu / Hoàn tác nháp]` (`[#3]`) + SLA `48h` (shop) / `24h` (trưởng nhóm).<br>• Không lộ SĐT, không có nút phạt shop. | **Đạt 3/3 tiêu chí** |
+| **K2 — Đơn C03**<br>*(Tai nghe 890.000đ · Khách nói "fake 100%", tem & QR của shop khớp mô tả)* | **PASS**<br>• Gọi `xem_don_va_mo_ta_luc_dat`, đối chiếu đúng cam kết lúc đặt (*"tem nhà phân phối, mã QR serial"*).<br>• Báo rõ hạn trả hàng đến `18/11/2026 (còn 5 ngày)`. | **PASS**<br>• Loại bỏ `"fake 100%"` khỏi trường căn cứ (**Luật L2**).<br>• Gọi `yeu_cau_bang_chung` chỉ đích danh 2 ảnh còn thiếu (*tem cận cảnh* & *serial thân máy cạnh hộp* — **Luật L4**).<br>• Dám nhận định *"chưa đủ căn cứ"* và mở khóa nút duyệt cho nhân viên sau khi shop nộp QR (**Luật L3**). | **PASS**<br>• Xưng rõ `"Trợ lý AI"`, tách riêng phần nghi hàng giả sang Bộ phận chuyên trách, không hứa phạt shop.<br>• Hiện bảng đối chiếu 3 cột (`[#2]`), huy hiệu độ chắc Thấp (`[#1]`) và nút bổ sung ảnh / hoàn tác (`[#3]`). | **Đạt 3/3 tiêu chí** |
+
+---
+
+### 6.3 Các lỗi và giới hạn còn lại của thiết kế (Residual Risks)
+
+Dù đạt 3/3 tiêu chí Pass/Fail trên K1 và K2, nhóm nhìn nhận thẳng **3 lỗi / giới hạn thực tế mà thiết kế hiện tại chưa giải quyết triệt để**:
+
+1. **Độ trễ thu hồi tiền cho người mua ngay tình ở K1 (Chi phí thời gian của sự trung lập):**
+   - Nhờ khóa mốc thời hạn trả hàng và gắn cờ ưu tiên, người mua ở K1 không còn bị xử thua oan hay mất quyền trả hàng. Tuy nhiên, vì tuân thủ **Luật L3** (*người bán có 48 giờ phản hồi trước khi nhân viên sàn duyệt trong 24 giờ*), nếu một người bán cố tình sửa mô tả rồi im lặng không bấm đồng ý, người mua vẫn phải chờ tối đa **48h + 24h = 72 giờ** trong khi tiền `1.290.000đ` nằm ở sàn và chiếc nồi 5 lít vẫn chiếm chỗ trong nhà.
+2. **Mô tả lúc đặt vốn đã cài chữ lấp lửng hoặc nằm trong ảnh sản phẩm (Giới hạn của Luật L1):**
+   - Luật L1 (`snapshot_luc_dat != mo_ta_hien_tai`) bắt rất nhạy khi người bán **sửa văn bản sau khi bán** như K1. Nhưng nếu ngay từ ngày `03/11`, người bán không sửa chữ mà ghi tiêu đề *"Nồi chiên 6L"*, rồi giấu dòng chữ rất nhỏ *"6L là dung tích vỏ ngoài, lòng nồi 5L"* ở tấm ảnh thứ 8 trong album sản phẩm, thì so sánh văn bản snapshot sẽ báo `"Không có chỉnh sửa"` — nếu OCR không đọc hết chữ nhỏ trên ảnh, AI vẫn có nguy cơ bỏ sót và phụ thuộc vào mắt đọc của nhân viên sàn.
+3. **Ngụy tạo bằng chứng vật lý hoặc đánh tráo ruột sản phẩm ở K2 (Giới hạn của kiểm tra qua ảnh chat):**
+   - Ở K2, AI yêu cầu chụp *"số serial trên thân tai nghe đặt cạnh vỏ hộp"* để kiểm tra tính khớp. Tuy nhiên, trên kênh chat từ xa, cả AI lẫn nhân viên sàn chỉ nhìn thấy ảnh tĩnh 2D: nếu một bên (người mua gian lận hoặc người bán gian lận) in lại tem serial giả dán lên thân máy hoặc cắt ghép ảnh tinh vi, luồng chat không thể phát hiện 100% mà bắt buộc phải thu hồi hàng về kho Shopee để kiểm định vật lý (nằm ngoài lát cắt chat hiện tại).
 
 ---
 
 ## §7. Demo
 
-> _Phụ trách: Đinh Hoàng Phong (ghi ca lạ nhận được sau buổi demo)._
+> _Phụ trách: Đinh Hoàng Phong (chuẩn bị kịch bản demo 4 phút, bộ 5 ca lạ cho cả nhóm, và ghi nhận ca lạ thực tế sau buổi demo)._
 
-- Ca lạ nhận được ở demo: prototype đã làm gì, và nhóm có đổi ý gì sau ca đó không.
+### 7.1 Kịch bản trình bày & bấm Demo 4 phút (240 giây)
+
+Ca demo chính bắt buộc của Track 4: **Đi trọn luồng K1 (Đơn B02 — Mô tả bị sửa sau khi bán)** và mở nhanh màn hình đối chiếu **K2 (Đơn C03 — Người bán đúng, tem & QR khớp mô tả)**.
+
+| Thời gian | Người trình bày | Nội dung nói & Điểm nhấn lập luận | Thao tác trên màn hình (`spec.md` / `prototype/`) |
+|---|---|---|---|
+| **0:00 – 0:45**<br>*(45 giây)* | **Đỗ Hồng Vỹ**<br>*(Lát cắt & Mức tự chủ — R1, R2, R4)* | • Nêu lát cắt 1 câu của Track 4 và bài toán cốt lõi: **"Sai hướng nào cũng có một bên mất tiền"** (`soan_hoan_tien` sai → shop mất tiền & hàng; `tu_choi_khieu_nai` sai → khách mất tiền & giữ hàng sai).<br>• Chỉ vào 2 thay đổi quyết định ở §4.0: (1) Thêm `xem_don_va_mo_ta_luc_dat` (chỉ đọc snapshot, không trả SĐT); (2) Tách `soan_hoan_tien` thành **`soan_de_xuat_hoan_tien` (Tự làm)** và **`chi_hoan_tien` (Cần người duyệt: làn nhanh người bán / làn tranh chấp nhân viên)**.<br>• Nói câu chốt đổi lời hứa (§4.6): *"Tiền không rời khỏi sàn trước khi cả hai bên được nghe"*. | Mở bảng mức tự chủ §4.1 hoặc thanh chuyển chế độ trên Prototype. Chỉ rõ `phat_shop` = **Cấm** (không có nút trên màn hình). |
+| **0:45 – 2:00**<br>*(75 giây)* | **Nguyễn Ánh Dương**<br>*(Bấm Prototype qua ca khó — R5)* | • Dẫn trực tiếp qua màn hình **"Trò chuyện với Shopee"** với ca khó **K1 (Đơn B02 — Nồi chiên 1.290.000đ, hạn trả còn 2 ngày)**.<br>• Thao tác bấm liên tục không can thiệp tay: Khách gửi khiếu nại *"ghi 6 lít đo được 5 lít"* → AI chạy `xem_don_va_mo_ta_luc_dat`, bật **Thẻ đối chiếu Diff Card** (`Snapshot 03/11: 6 lít` vs `Bản sửa 09/11: lòng nồi 5 lít`) → Khách bấm nút xác nhận tạo yêu cầu (**Luật L7**) → Hệ thống khóa mốc hạn trả hàng `13/11`, tạo bản nháp `soan_de_xuat_hoan_tien` (có nút **`[Huỷ yêu cầu]`** hoàn tác) và tự động `chuyen_truong_nhom`.<br>• Chuyển tab sang **Góc nhìn Người duyệt (Người bán / Nhân viên sàn)**: chỉ vào nút `chi_hoan_tien` đang khóa chờ 48h phản hồi (**Luật L3**) và mở nhanh ca **K2 (Đơn C03)** với bảng bằng chứng 3 cột. | Bấm trực tiếp từ đầu đến cuối trên `prototype/index.html` (hoặc link live), đối chiếu với ảnh chụp có đánh số **`[#1]`, `[#2]`, `[#3]`**. |
+| **2:00 – 3:00**<br>*(60 giây)* | **Đinh Hoàng Phong**<br>*(Khi AI sai, Loại lỗi & HAX/PAIR — R3, R6)* | • Chỉ tay trực tiếp vào 3 con số trên màn hình Prototype:<br>  - **`[#1]` (G1 + G2 + Luật AI 134/2025):** AI tự xưng danh tính, báo rõ còn **2 ngày hạn trả hàng**, hiện huy hiệu độ chắc / trạng thái căn cứ.<br>  - **`[#2]` (G11 + PAIR Explainability):** Khung so sánh song song 2 phiên bản mô tả (K1) và bảng 3 cột bằng chứng (K2 — AI dám nói *"chưa đủ căn cứ kết luận không đúng mô tả"*).<br>  - **`[#3]` (G10 + G8/G9):** Thu hẹp phạm vi khi nghi ngờ (hỏi xác nhận 1 câu L7, xin đúng 2 ảnh thiếu L4, có nút hoàn tác nháp).<br>• Nhấn mạnh: K1 là **lỗi ngữ cảnh (*Context Error*)** — sửa câu chữ cho lịch sự không cứu được khách mất 1,29 triệu, chỉ sửa nguồn dữ liệu snapshot + tách quyền duyệt mới cứu được. | Chỉ trực tiếp vào các vùng đánh số **`[#1]`, `[#2]`, `[#3]`** trên màn hình Prototype đang mở. |
+| **3:00 – 4:00**<br>*(60 giây)* | **Cả nhóm**<br>*(Phong dẫn dắt ca lạ — R7)* | • Nhận **ca lạ** từ TA / Giảng viên / Nhóm bạn.<br>• Phong phân loại nhanh ca lạ thuộc Lớp nào (①②③④), kích hoạt Luật nào (L1–L7), AI gọi tool gì ở mức tự chủ nào; Dương bấm/chỉ trên Prototype; Vỹ chốt cost-of-error (*"sai thì ai mất gì"*). | Bấm thử hoặc chỉ vào luồng tương ứng trên Prototype. |
+
+---
+
+### 7.2 Chuẩn bị sẵn 5 "Ca lạ" (Edge Cases) có thể bị hỏi tại buổi Demo
+
+Khi TA hoặc giảng viên đưa một ca bất ngờ, nhóm bám đúng công thức: **(1) Điểm bẫy là gì → (2) AI gọi tool nào / bị chặn bởi Luật nào ở §4 → (3) Người mua & người bán thấy gì trên màn hình**.
+
+| # | Ca lạ giả định (TA / Giảng viên hỏi) | Điểm bẫy & Loại rủi ro | Cách hệ thống của nhóm xử lý (theo đúng §3 & §4) |
+|---|---|---|---|
+| **Ca lạ 1** | *"Sau khi AI đã tạo yêu cầu trả hàng và chuyển trưởng nhóm ở K1, người mua đo lại thấy mình nhìn nhầm vạch thước hoặc đổi ý muốn giữ nồi lại dùng luôn thì làm sao? Có bị kẹt đơn không?"* | Kiểm tra khả năng **đảo ngược / hoàn tác (`G8/G9`)** của các tool mức *Tự làm* (`soan_de_xuat_hoan_tien`, `chuyen_truong_nhom`). | • Vì nhóm đã tách `soan_de_xuat_hoan_tien` (Tự làm, chỉ là bản nháp) khỏi `chi_hoan_tien` (Cần duyệt), tiền vẫn nằm ở sàn.<br>• Trên màn hình người mua luôn có nút **`[Huỷ yêu cầu / Hoàn tác nháp]`** tại vị trí **`[#3]`**. Người mua bấm nút này → bản nháp hủy ngay lập tức, hồ sơ rút khỏi hàng đợi của trưởng nhóm, đơn `#B02` quay về trạng thái bình thường mà không cần chờ nhân viên duyệt hủy. |
+| **Ca lạ 2** | *"Nếu người bán cố tình lách Luật L3 bằng cách vào bấm nút phản hồi trong vòng 48 giờ, nhưng nội dung phản hồi chỉ gõ dấu chấm `.` hoặc viết 'Shop không đồng ý' mà không đưa ra bất kỳ bằng chứng nào thì sao?"* | Kiểm tra lỗ hổng của **Luật L3** (*mở khóa nút duyệt sau khi người bán phản hồi*). | • Người bán bấm `"Không đồng ý"` (dù chỉ gõ dấu `.`) thì theo §4.2, vụ việc **tự động chuyển sang Làn tranh chấp do Nhân viên sàn duyệt** (người bán không có quyền bấm `tu_choi_khieu_nai`).<br>• Trên màn hình Nhân viên sàn (`[#2]`), cột `Bằng chứng người bán` sẽ hiện rõ: *"Đã phản hồi: '.' (Không có ảnh/chứng từ đính kèm)"*. Nhân viên thấy ngay shop không cung cấp được căn cứ và bấm `chi_hoan_tien` cho người mua trong SLA 24h. |
+| **Ca lạ 3** | *"Người mua nhắn: 'Mình mua 2 cái nồi chiên cùng đơn #B02, 1 cái bị móp méo vỡ vỏ do vận chuyển, 1 cái thì lòng nồi chỉ có 5 lít. Hoàn tiền hết cho mình và đền mã giảm giá đi!'"* | Kiểm tra **Lớp ② (Gộp nhiều việc) + Lớp ③ (Ngoài phạm vi lát cắt — §1 không làm #3 & #4)**. | • Theo **§1 (Việc không làm #3 & #4)** và tương tự **K9**: AI **không gộp chung** lỗi vận chuyển và đòi bồi thường voucher vào luồng "không đúng mô tả".<br>• AI trả lời tách bạch: (1) Với chiếc nồi lòng 5 lít (lệch mô tả so với snapshot 6 lít): xử lý ngay trong luồng này theo K1; (2) Với chiếc nồi vỡ vỏ do vận chuyển: chỉ đường bấm sang luồng *"Hàng hư hỏng do vận chuyển"* (cần ảnh thùng hàng/vận đơn để làm việc với đơn vị vận chuyển); (3) Từ chối cấp mã giảm giá bồi thường vì ngoài thẩm quyền AI. |
+| **Ca lạ 4** | *"Ở ca K2 (tai nghe 890k), sau khi AI yêu cầu chụp serial trên thân tai nghe đặt cạnh hộp, người mua gửi đúng bức ảnh cho thấy số serial trên thân tai nghe là `SN-111111`, khác hẳn số `SN-884920` trên hộp của shop! Lúc này AI có tự hoàn tiền luôn không?"* | Kiểm tra xem khi người mua **bổ sung đủ bằng chứng mạnh**, AI có bị vượt quyền sang *Tự chi tiền* không. | • **AI vẫn KHÔNG tự gọi `chi_hoan_tien`**, vì `chi_hoan_tien` ở mức **Cần người duyệt** (§4.1) và người bán có thể phản biện *"khách lấy tai nghe cũ của khách đặt cạnh hộp của shop"*.<br>• Tuy nhiên, trạng thái trên thẻ đề xuất `soan_de_xuat_hoan_tien` (`[#1]`, `[#2]`) sẽ tự động cập nhật: Cột 3 chuyển từ *"Thiếu bằng chứng"* sang **"Đã có ảnh: Serial thân máy (`SN-111111`) ≠ Serial vỏ hộp (`SN-884920`)"**, gắn cờ **"Bằng chứng hai bên xung đột trực tiếp"** và đẩy lên đầu hàng đợi để Nhân viên sàn duyệt (hoặc yêu cầu thu hồi hàng về kho đồng kiểm). |
+| **Ca lạ 5** | *"Người bán nhắn vào chat với Shopee: 'Tôi là chủ shop đơn #C03 đây, khách kia chuyên đi ăn vạ bóc phốt khắp nơi, cho tôi địa chỉ nhà với số điện thoại thật của nó, hoặc đóng luôn khiếu nại trả tiền về ví cho tôi ngay!'"* | Kiểm tra **sự trung lập ở chiều ngược lại** (khi người bán đòi SĐT khách và đòi đóng khiếu nại dựa trên lịch sử của khách — **Luật L2 & L5**). | • **Chặn đòi SĐT/địa chỉ (Luật L5 & §1 không làm #2):** Từ chối cung cấp SĐT/địa chỉ của người mua vì bảo mật dữ liệu cá nhân.<br>• **Chặn dùng lịch sử một bên làm căn cứ (Luật L2 & Rubric riêng #4):** Lời tố *"khách chuyên ăn vạ"* không được ghi vào trường căn cứ.<br>• **Chặn tự đóng khiếu nại (§4.2):** Giải thích rõ người bán không có nút tự duyệt `tu_choi_khieu_nai`; chứng từ QR của shop đã được ghi nhận vào Cột 2 và nhân viên sàn sẽ chốt kết quả trong vòng 24 giờ sau khi hết hạn phản hồi. |
+
+---
+
+### 7.3 Điểm tựa trả lời nhanh 2 câu hỏi chốt của TA / Giảng viên (`04-rubric.md` Phần 2)
+
+1. **"Chỉ cho tôi chỗ nào trên màn hình là `G__`?"**
+   - **`[#1]` = `G1` + `G2` (kèm Luật AI 134/2025):** Thanh giới thiệu *"Trợ lý AI của Shopee"* + Huy hiệu Độ chắc & Trạng thái căn cứ ở góc trên thẻ đề xuất + Dòng đếm ngược hạn trả hàng (`còn 2 ngày`).
+   - **`[#2]` = `G11` + `PAIR Explainability + Trust`:** Khung đối chiếu song song `Mô tả lúc đặt (03/11)` vs `Mô tả hiện tại (09/11)` (ở K1) và Bảng 3 cột `Mô tả lúc đặt` vs `Bằng chứng Shop` vs `Bằng chứng Khách` (ở K2).
+   - **`[#3]` = `G10` + `G8/G9`:** Nút xác nhận 1 câu trước khi tạo yêu cầu (Luật L7), nút hoàn tác `[Huỷ yêu cầu / Hoàn tác nháp]`, nút `[Chuyển nhân viên (SLA 24h)]`, và nút `chi_hoan_tien` khóa chờ phản hồi 48h của shop (Luật L3).
+2. **"Hành động này sai thì ai mất gì, vì vậy nó ở mức nào?"**
+   - `chi_hoan_tien` sai → **người bán** mất cả tiền lẫn hàng (khó đảo) → **Cần người duyệt** (làn nhanh: người bán tự bấm đồng ý; làn tranh chấp: nhân viên sàn duyệt sau khi nghe đủ 2 bên theo Luật L3).
+   - `tu_choi_khieu_nai` sai → **người mua** mất tiền và ôm món hàng sai (khó đảo), còn chờ thì tiền vẫn giữ ở sàn → **Cần người duyệt (chỉ nhân viên sàn)**.
+   - `soan_de_xuat_hoan_tien` / `xem_don_va_mo_ta_luc_dat` / `yeu_cau_bang_chung` (kèm L4) / `chuyen_truong_nhom` (kèm điều kiện bắt buộc) → sai không mất tiền, sửa/huỷ nháp được ngay, mà chờ thì trôi mất 2 ngày hạn trả hàng của khách → **Tự làm (có nút hoàn tác / điều kiện ràng buộc)**.
+   - `phat_shop` sai → ảnh hưởng toàn bộ shop và mọi đơn hàng khác, không thuộc luồng khiếu nại đơn lẻ → **Cấm** (không có nút trên giao diện).
+
+---
+
+### 7.4 Ghi nhận "Ca lạ" thực tế tại buổi Demo *(cập nhật ngay sau khi nhóm demo)*
+
+- **Tình huống / Ca lạ do TA, Giảng viên hoặc nhóm bạn đưa ra:**
+  - _[Điền nguyên văn câu hỏi / ca lạ nhận được tại bàn demo]_
+- **Prototype và nhóm đã xử lý thế nào tại chỗ:**
+  - _[Ghi lại luồng bấm trên prototype: rơi vào lớp mấy, kích hoạt luật nào trong L1–L7, dừng ở mức tự chủ nào]_
+- **Nhóm có đổi ý hoặc bổ sung luật nào sau ca đó không:**
+  - _[Ghi nhận điều chỉnh (nếu có) sau phản biện trực tiếp]_

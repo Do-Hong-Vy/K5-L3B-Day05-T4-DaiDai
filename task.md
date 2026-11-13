@@ -36,7 +36,7 @@
 - [x] Khoanh **2 kịch bản đắt nhất** + lý do vì sao đắt hơn + kịch bản **suýt được chọn** và vì sao không.
 
 **§4 Mức tự chủ (R4 · 25đ) — mốc M2, phút 125**
-- [ ] Tổ chức bước "mỗi người tự xếp mức 5 tool trong 5', không bàn" → ghi lại **ai chọn gì**. _(Đã viết sẵn phương án của Vỹ trong spec.md §4.3; **còn thiếu lựa chọn của Phong và Dương**: cần chạy vòng xếp mức thật rồi điền.)_
+- [ ] Tổ chức bước "mỗi người tự xếp mức 5 tool trong 5', không bàn" → ghi lại **ai chọn gì**. _(Đã viết sẵn phương án của Vỹ và Phong trong spec.md §4.3; **còn thiếu lựa chọn của Dương**.)_
 - [x] Với **từng tool** trong 5 tool: mức (tự làm / cần người duyệt / cấm) · sai thì ai chịu gì · đảo được không · chờ người thì mất gì · phương án đã loại. Nếu cần duyệt: **ai duyệt, thấy gì, quá hạn thì sao**.
 - [x] **Tool khó xếp nhất** (gần như chắc là `soan_hoan_tien` hoặc `tu_choi_khieu_nai`): cái giá mỗi phía trỏ về kịch bản §2, nhóm chốt thế nào.
 - [x] **Thử mức** trên 2 kịch bản đắt nhất + 1 kịch bản bình thường (ca áo size L→M, shop đã nhận gửi nhầm) theo 3 câu: sai có bị chặn? còn làm khi lẽ ra phải hỏi? người bình thường có phải chờ vô ích?
@@ -45,27 +45,27 @@
 
 **Repo & nộp bài**
 - [x] Repo `K5-L3B-Day05-T4-DaiDai` đã tạo; copy `03-spec-template.md` → `spec.md`, điền bảng thành viên + **mã HV đúng**.
-- [ ] Cuối buổi: điền cột "Việc đã làm" cho Phong và Dương (của Vỹ đã điền), điền Bàn/zone, kiểm tra mở repo bằng cửa sổ ẩn danh, nộp link.
+- [ ] Cuối buổi: điền cột "Việc đã làm" cho Dương (của Vỹ và Phong đã điền), điền Bàn/zone, kiểm tra mở repo bằng cửa sổ ẩn danh, nộp link.
 
 ---
 
 ### Đinh Hoàng Phong — Khi AI sai & Demo
 
 **§3 Khi AI sai (R3 · 25đ) — chỉ cho 2 kịch bản đắt nhất**
-- [ ] Mỗi kịch bản: **câu AI nói nguyên văn** · người mua/người bán **thấy gì** (độ chắc, căn cứ, nút, nhãn) · **làm gì tiếp** · **ai được báo, sau bao lâu**.
-- [ ] Quyết định **hỏi lại / trả lời kèm giới hạn / dừng và chuyển người**: chọn gì, loại gì, vì sao (đây là 8đ — phần nặng nhất của R3).
-- [ ] Gọi đúng **loại lỗi** (hệ thống / người dùng / ngữ cảnh) và cách nói xin lỗi, cách sửa khác nhau theo loại.
-- [ ] Chọn **2–3 nguyên tắc HAX/PAIR** (gợi ý: G2 độ chắc, G10 thu hẹp khi nghi ngờ, G11 giải thích vì sao, PAIR Explainability + Trust), mỗi cái trỏ vào câu chữ cụ thể → **gửi danh sách cho Dương** để đặt lên prototype.
-- [ ] Chỉ ra **1 lỗi sửa câu chữ không cứu được**, chỉ thiết kế mới cứu (VD: AI so với mô tả *hiện tại* thay vì mô tả *lúc đặt* → phải sửa nguồn dữ liệu AI đọc, không phải sửa câu).
-- [ ] Đảm bảo câu chữ: AI tự giới thiệu là AI (G1/Luật AI 134/2025), nói rõ **thời hạn trả hàng còn bao lâu**, không hứa phạt shop, không đưa SĐT.
+- [x] Mỗi kịch bản: **câu AI nói nguyên văn** · người mua/người bán **thấy gì** (độ chắc, căn cứ, nút, nhãn) · **làm gì tiếp** · **ai được báo, sau bao lâu**.
+- [x] Quyết định **hỏi lại / trả lời kèm giới hạn / dừng và chuyển người**: chọn gì, loại gì, vì sao (đây là 8đ — phần nặng nhất của R3).
+- [x] Gọi đúng **loại lỗi** (hệ thống / người dùng / ngữ cảnh) và cách nói xin lỗi, cách sửa khác nhau theo loại.
+- [x] Chọn **2–3 nguyên tắc HAX/PAIR** (gợi ý: G2 độ chắc, G10 thu hẹp khi nghi ngờ, G11 giải thích vì sao, PAIR Explainability + Trust), mỗi cái trỏ vào câu chữ cụ thể → **gửi danh sách cho Dương** để đặt lên prototype.
+- [x] Chỉ ra **1 lỗi sửa câu chữ không cứu được**, chỉ thiết kế mới cứu (VD: AI so với mô tả *hiện tại* thay vì mô tả *lúc đặt* → phải sửa nguồn dữ liệu AI đọc, không phải sửa câu).
+- [x] Đảm bảo câu chữ: AI tự giới thiệu là AI (G1/Luật AI 134/2025), nói rõ **thời hạn trả hàng còn bao lâu**, không hứa phạt shop, không đưa SĐT.
 
 **§6 Tốt là gì (R6 · 5đ)**
-- [ ] 3 tiêu chí **Pass/Fail** người ngoài chấm ra cùng kết quả (VD: "AI không gọi `soan_hoan_tien` trước khi người bán hết hạn phản hồi").
-- [ ] Chấm thử trên 2 kịch bản đắt nhất, ghi lỗi còn lại.
+- [x] 3 tiêu chí **Pass/Fail** người ngoài chấm ra cùng kết quả (VD: "AI không gọi `soan_hoan_tien` trước khi người bán hết hạn phản hồi").
+- [x] Chấm thử trên 2 kịch bản đắt nhất, ghi lỗi còn lại.
 
 **§7 Kịch bản demo (R7)**
-- [ ] Viết kịch bản demo 4 phút: ai nói gì, bấm đâu. Ca bắt buộc: **người bán đúng hoặc mô tả đã bị sửa**.
-- [ ] Chuẩn bị sẵn 4–5 **ca lạ** có thể bị hỏi và câu trả lời theo đúng mức tự chủ của nhóm; tập cho cả nhóm.
+- [x] Viết kịch bản demo 4 phút: ai nói gì, bấm đâu. Ca bắt buộc: **người bán đúng hoặc mô tả đã bị sửa**.
+- [x] Chuẩn bị sẵn 4–5 **ca lạ** có thể bị hỏi và câu trả lời theo đúng mức tự chủ của nhóm; tập cho cả nhóm.
 - [ ] Sau demo: ghi ca lạ nhận được vào §7 của `spec.md`.
 
 ---
